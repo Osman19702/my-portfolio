@@ -1,4 +1,4 @@
-const form = document.getElementById('contact-form');
+/* const form = document.getElementById('contact-form');
 const name = document.getElementById('name');
 const email = document.getElementById('email');
 const subject = document.getElementById('subject');
@@ -22,15 +22,13 @@ form.addEventListener('submit', function(event) {
   .then(response => {
     if (response.ok) {
       showNotification('Your message was sent successfully!', 'success');
-      alert('Your message has been sent!');
     } else {
       showNotification('Something went wrong. Please try again later!', 'error');
-      alert('There was a problem sending your message.');
     }
   })
   .catch(error => {
     console.error(error);
     showNotification('Something went wrong. Please try again later!', 'error');
-    alert('There was a problem sending your message.');
   });
 });
+ */

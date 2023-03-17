@@ -1,4 +1,4 @@
-// Select the notification element
+/* // Select the notification element
 const notification = document.querySelector('#notification');
 
 // Define a function to show the notification
@@ -23,4 +23,4 @@ function showNotification(message, type) {
   setTimeout(() => {
     notification.classList.remove('show');
   }, 3000);
-}
+} */
