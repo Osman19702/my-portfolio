@@ -148,54 +148,55 @@ section {
   pointer-events: none;
 }
 
+/*Header animations*/
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(20px) rotate(-5deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
 /*Header-content*/
 .header-content {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  min-height: 100vh;
-}
-.header-content .left-header {
   display: flex;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   position: relative;
-}
-.header-content .left-header .h-shape {
-  transition: all 0.4s ease-in-out;
-  width: 65%;
-  height: 100%;
-  background-color: var(--color-secondary);
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: -1;
-  clip-path: polygon(0 0, 46% 0, 79% 100%, 0% 100%);
-}
-.header-content .left-header .image {
-  border-radius: var(--br-sm-2);
-  height: 90%;
-  width: 68%;
-  margin-left: 4rem;
-  background-color: var(--color-black);
-  transition: all 0.4s ease-in-out;
-}
-.header-content .left-header .image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: all 0.4s ease-in-out;
-  filter: grayscale(100%);
-}
-.header-content .left-header .image img:hover {
-  filter: grayscale(0);
+  overflow: hidden;
 }
 .header-content .right-header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-right: 18rem;
+  max-width: 700px;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
 }
 .header-content .right-header .name {
   font-size: 3rem;
+  animation: fadeInUp 0.8s ease-out both;
 }
 .header-content .right-header .name span {
   color: var(--color-secondary);
@@ -203,6 +204,65 @@ section {
 .header-content .right-header p {
   margin: 1.5rem 0;
   line-height: 2rem;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+.header-content .right-header .btn-con {
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+/*Floating background shapes*/
+.header-shapes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.header-shapes .shape {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--color-secondary);
+}
+.header-shapes .shape-1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: -5%;
+  opacity: 0.07;
+  animation: float 8s ease-in-out infinite;
+}
+.header-shapes .shape-2 {
+  width: 200px;
+  height: 200px;
+  bottom: 15%;
+  right: 5%;
+  opacity: 0.05;
+  animation: floatReverse 10s ease-in-out infinite;
+}
+.header-shapes .shape-3 {
+  width: 120px;
+  height: 120px;
+  top: 20%;
+  right: 15%;
+  opacity: 0.06;
+  animation: float 12s ease-in-out infinite;
+  border-radius: 30%;
+}
+.header-shapes .shape-4 {
+  width: 80px;
+  height: 80px;
+  bottom: 30%;
+  left: 15%;
+  opacity: 0.08;
+  animation: pulse 6s ease-in-out infinite;
+}
+.header-shapes .shape-5 {
+  width: 160px;
+  height: 160px;
+  top: 55%;
+  left: 40%;
+  opacity: 0.04;
+  animation: floatReverse 9s ease-in-out infinite;
+  border-radius: 40%;
 }
 
 /*About*/
@@ -983,16 +1043,10 @@ section {
   }
 
   .header-content {
-    grid-template-columns: repeat(1, 1fr);
     padding-bottom: 6rem;
   }
 
-  .left-header .h-shape {
-    display: none;
-  }
-
   .right-header {
-    grid-row: 1;
     padding-right: 0rem !important;
     width: 90%;
     margin: 0 auto;
@@ -1001,11 +1055,6 @@ section {
     font-size: 2.5rem !important;
     text-align: center;
     padding-top: 3rem;
-  }
-
-  .header-content .left-header .image {
-    margin: 0 auto;
-    width: 90%;
   }
 
   .controls {
@@ -1203,20 +1252,10 @@ section {
   }
 
   .header-content {
-    grid-template-columns: repeat(1, 1fr);
     padding-bottom: 6rem;
   }
 
-  .left-header .h-shape {
-    display: none;
-  }
-  .left-header .image {
-    width: 90% !important;
-    margin: 0 auto !important;
-  }
-
   .right-header {
-    grid-row: 1;
     padding-right: 0rem !important;
     width: 90%;
     margin: 0 auto;
