@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Osman Turalioglu">
+  <rect width="64" height="64" rx="14" fill="#191d2b"/>
+  <circle cx="21" cy="32" r="10" fill="none" stroke="#457fe4" stroke-width="6.5"/>
+  <rect x="37" y="18.75" width="20" height="7" fill="#ffffff"/>
+  <rect x="43.5" y="18.75" width="7" height="26.5" fill="#ffffff"/>
+</svg>
