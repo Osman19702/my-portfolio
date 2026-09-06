@@ -26,7 +26,8 @@ GROUND TRUTH — read these before proposing anything
     Includes an inline SVG icon sprite; regenerate with `npm run build:icons`.
   styles/styles.css (~1264 lines) — the LIVE stylesheet, linked by index.html
   styles/styles.scss (~109 lines) + styles.css.map — STALE. See TRAPS.
-  app.js (~65 lines) — tab switching (ARIA tabs + roving tabindex) and theme toggle
+  app.js (~99 lines) — tab switching (ARIA tabs + roving tabindex), theme toggle,
+    and reassembly of the split email/phone contact details
   form-submission.js — contact form validation, spam guards, Web3Forms POST
   notification.js — toast notifications (live region)
   (server-side.js was deleted; it could never run on static hosting)
@@ -46,6 +47,11 @@ GROUND TRUTH — read these before proposing anything
   an inline SVG sprite; do not reintroduce the CDN stylesheet.
 - All five Poppins weights (400/500/600/700/800) are genuinely used in CSS.
   None can be dropped - this was checked.
+- index.html declares a strict CSP by <meta>. Anything that adds an inline <script>,
+  an inline style attribute, an inline handler, or a new external origin will be BLOCKED
+  until that directive is updated. Check the browser console after any such change.
+- The email and phone exist ONLY as data attributes, reassembled by app.js. Never write
+  either back into the markup in plain form, and never re-add "email" to the JSON-LD.
 - Do NOT add rel=preload for the Google font files. It was measured (LCP -157ms
   for one preload) and rejected: the URLs pin Poppins v24 and will 404 silently
   when Google rotates, which also fails the CI no-4xx check for an external
@@ -378,7 +384,7 @@ Found by reading the repo; each is real and reproducible today.
 | 3 | ~~`img/img1.jpg` (1.6 MB) referenced nowhere~~ **FIXED** (3593e08) - deleted | - | - |
 | 4 | ~~Contact form + handler + notifications all commented out~~ **FIXED** (97fdc12) - Web3Forms, validation, spam guards | - | Needs an access key pasted in before it delivers mail |
 | 5 | ~~`server-side.js` cannot run on static hosting~~ **FIXED** (97fdc12) - deleted, with all 4 runtime deps | - | - |
-| 6 | `styles.scss` (109 ln) stale vs `styles.css` (1300 ln) | styles/ | Recompiling destroys the site |
+| 6 | `styles.scss` (109 ln) stale vs `styles.css` (~1300 ln) | styles/ | Recompiling destroys the site. STILL OPEN - see UC-8 |
 | 7 | ~~No description, canonical, OG, favicon, robots, sitemap, JSON-LD~~ **FIXED** (2c779f9) | - | Not yet validated against live crawlers |
 | 8 | ~~`npm test` exits 1 by design~~ **FIXED** (d71b611) - 49 Playwright tests across 7 specs | - | - |
 | 9 | ~~Two `<script>` tags load fully-commented files~~ **FIXED** (2798137) | - | - |
@@ -390,3 +396,4 @@ Found by reading the repo; each is real and reproducible today.
 | 15 | A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it | styles.css:~705, ~1130, ~1210 | Same abandoned-scaffold pattern as #portfolio; left in place as out of scope |
 | 16 | `tests/static-server.js` resolved its root from `__dirname/..`, so `cd`-ing elsewhere still served the repo root - it silently invalidated a before/after comparison | fixed (2798137) | Now honours `STATIC_ROOT`; always verify two servers serve different builds before trusting a diff |
 | 17 | **ACTION REQUIRED**: index.html carries `WEB3FORMS_ACCESS_KEY_HERE`. Until a real key from web3forms.com replaces it, the contact form validates but reports "not configured" instead of sending | index.html | The only thing standing between the form and working |
+| 18 | ~~Social links missing `rel="noopener noreferrer"`; no CSP; email and phone harvestable from raw HTML~~ **FIXED** (130a5d8) | - | CSP is meta-delivered, so `frame-ancestors` is inert; a real header host would close that |
