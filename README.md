@@ -17,7 +17,7 @@ small scripts, **no framework and no build step**. The files in the repo root ar
 files the browser gets.
 
 It is also a work sample. The owner is a QA engineer, so the repo carries a real test
-suite — **82 Playwright tests across 8 spec files**, including accessibility scans of
+suite — **85 Playwright tests across 8 spec files**, including accessibility scans of
 every panel in both themes, and they run in CI on every push and pull request.
 
 ## Stack
@@ -60,6 +60,11 @@ npm run test:report  # open the last HTML report
 
 Chromium only, to keep installs and CI fast. Add browsers in `playwright.config.js` if
 you want cross-browser evidence.
+
+The contact-form specs mock `api.web3forms.com` rather than posting to it, so the suite
+sends no mail and stays deterministic. That is also a practical necessity: the endpoint
+is behind Cloudflare, which rejects the CORS preflight from a headless user agent. A
+live send was verified once, by hand, with a real browser UA.
 
 | Spec | Covers |
 |---|---|
@@ -146,9 +151,11 @@ theme setter — is allowed by its `sha256` hash; **if you edit it, regenerate t
 
 Honest list, not a marketing section.
 
-- **The contact form is not delivering yet.** `index.html` carries a placeholder
-  Web3Forms access key. Until a real key replaces it, the form validates and reports
-  that it is not configured. Get one at <https://web3forms.com>.
+- **The contact form's spam guards are client-side only.** The honeypot and the
+  minimum-fill-time check stop bots that drive the form in a browser. Nothing stops a
+  script POSTing straight to the Web3Forms endpoint, because the access key is public
+  by necessity — it ships in the markup. Web3Forms' own filtering is the only backstop
+  there, and the free tier caps submissions per month.
 - **Layout is tight at 360px.** The container reserves 80px of horizontal padding at a
   360px viewport, leaving the hero heading a ~220px column. It wraps correctly and
   nothing is cut off, but there is little room to spare on the smallest phones.

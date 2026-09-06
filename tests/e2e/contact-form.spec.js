@@ -137,11 +137,18 @@ test.describe('Contact form', () => {
         expect(called, 'submissions faster than a human must not be sent').toBe(false);
     });
 
+    // The shipped page carries a real key, so this drives the guard directly.
+    // The guard still earns its place: it is what a fork of this repo, or the
+    // site with a mistyped key, hits instead of posting into the void.
     test('an unconfigured access key fails loudly instead of silently', async ({ page }) => {
         let called = false;
         await page.route(ENDPOINT, async (route) => {
             called = true;
             await route.abort();
+        });
+
+        await page.locator('[name="access_key"]').evaluate((el) => {
+            el.value = 'WEB3FORMS_ACCESS_KEY_HERE';
         });
 
         await fillValidly(page);
@@ -151,6 +158,55 @@ test.describe('Contact form', () => {
         await expect(page.locator('#notification-text')).toContainText(/not configured/i);
         await expect(page.locator('#notification')).toHaveClass(/is-error/);
         expect(called).toBe(false);
+    });
+
+    test('an empty access key is refused just as loudly', async ({ page }) => {
+        let called = false;
+        await page.route(ENDPOINT, async (route) => {
+            called = true;
+            await route.abort();
+        });
+
+        await page.locator('[name="access_key"]').evaluate((el) => { el.value = '   '; });
+
+        await fillValidly(page);
+        await page.waitForTimeout(FILL_GUARD_MS);
+        await page.locator('#contact-submit').click();
+
+        await expect(page.locator('#notification-text')).toContainText(/not configured/i);
+        expect(called).toBe(false);
+    });
+
+    // Regression guard for the deployed page: the form is only useful if the
+    // markup that actually ships names a real inbox. A placeholder committed
+    // by accident would otherwise fail silently in production and nowhere else.
+    test('the page ships a real access key, not a placeholder', async ({ page }) => {
+        const key = await page.locator('[name="access_key"]').inputValue();
+
+        expect(key, 'placeholder key committed to index.html').not.toBe('WEB3FORMS_ACCESS_KEY_HERE');
+        expect(key.trim(), 'access key is blank').not.toBe('');
+        expect(key, 'access key should be a Web3Forms UUID')
+            .toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    });
+
+    test('the subject that reaches the API is the one the visitor typed', async ({ page }) => {
+        let payload = null;
+        await page.route(ENDPOINT, async (route) => {
+            payload = JSON.parse(route.request().postData() || '{}');
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true }),
+            });
+        });
+
+        await fillValidly(page);
+        await page.waitForTimeout(FILL_GUARD_MS);
+        await page.locator('#contact-submit').click();
+        await expect(page.locator('#notification')).toHaveClass(/is-success/);
+
+        expect(payload.subject).toBe('Senior QA role');
+        expect(payload.from_name).toBe('osmanturalioglu.com');
     });
 
     test('a successful send confirms and clears the form', async ({ page }) => {

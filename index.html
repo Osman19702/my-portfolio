@@ -769,12 +769,15 @@
                             <!--
                               Web3Forms delivers the message; GitHub Pages cannot run server code.
                               The access key is public by design - it names the destination inbox
-                              and is not a secret. Get one emailed to you at https://web3forms.com
-                              and replace the placeholder below. Until then the form validates and
-                              reports a clear error instead of silently doing nothing.
+                              and grants nothing else, which is why it can sit in client-side
+                              markup. Replace it from https://web3forms.com if the inbox changes.
+
+                              There is deliberately no hidden "subject" here. The visible Subject
+                              field posts under that same name and, being later in the form, is
+                              the one that survives into the request - so a hidden one would be
+                              dead weight that reads as though it did something.
                             -->
-                            <input type="hidden" name="access_key" value="WEB3FORMS_ACCESS_KEY_HERE">
-                            <input type="hidden" name="subject" value="New message from osmanturalioglu.com">
+                            <input type="hidden" name="access_key" value="646ffe6b-bf50-4057-9e99-d80acf0dafa7">
                             <input type="hidden" name="from_name" value="osmanturalioglu.com">
 
                             <!-- Honeypot: off-screen and skipped by Tab, so only a bot fills it.
