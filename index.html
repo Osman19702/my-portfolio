@@ -6,6 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Osman Turalioglu | Senior QA Engineer</title>
 
+    <!--
+      Content-Security-Policy. Origins allowed, and why:
+        fonts.googleapis.com  the Poppins stylesheet
+        fonts.gstatic.com     the font files that stylesheet references
+        api.web3forms.com     the contact form POST
+      No 'unsafe-inline' is needed anywhere: the page has no inline script,
+      no inline style attribute and no inline event handler.
+
+      Two honest limits of delivering this by <meta> rather than an HTTP
+      header, which GitHub Pages cannot set:
+        - frame-ancestors is IGNORED in meta, so this does not stop the page
+          being framed. X-Frame-Options cannot be set by meta either.
+        - the policy only applies once the parser reaches this tag, so it
+          cannot cover anything earlier in the document.
+      Both would be fixed by moving to a host that sets response headers.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com; upgrade-insecure-requests">
+
     <!-- Primary meta -->
     <meta name="description" content="Senior QA Engineer in High Wycombe, UK. ISTQB CT-AI and CTAL-TAE certified, specialising in Playwright, API automation and AI-assisted testing.">
     <meta name="author" content="Osman Turalioglu">
@@ -45,7 +63,8 @@
 
     <!-- Structured data. Every value here is sourced from this page or from
          cv/OsmanTuraliogluCV.pdf. Do not add claims that are not in one of those.
-         UC-7 note: if the visible email is ever obfuscated, remove "email" below too. -->
+         The email field was deliberately removed in UC-7: structured data is the
+         easiest thing on the page for a harvester to read. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -57,7 +76,6 @@
       "jobTitle": "Senior QA Engineer",
       "description": "Senior QA Engineer specialising in modern test automation, secure delivery pipelines, and AI-driven quality engineering.",
       "url": "https://www.osmanturalioglu.com/",
-      "email": "mailto:osman.turalioglu@outlook.com",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "High Wycombe",
@@ -669,7 +687,15 @@
                                     <span>Email</span>
                                 </div>
                                 <p>
-                                    <span>: osman.turalioglu@outlook.com</span>
+                                    <span>: </span><span class="contact-value"
+                                          data-contact="email"
+                                          data-user="osman.turalioglu"
+                                          data-domain="outlook.com"></span><!--
+                                       Split across data attributes so the raw HTML
+                                       contains no parseable address. app.js reassembles
+                                       it. No <noscript> fallback on purpose: without JS
+                                       this panel never renders at all, since only #home
+                                       carries .active and only JS toggles the rest. -->
                                 </p>
                             </div>
 
@@ -679,7 +705,10 @@
                                     <span>Mobile Number</span>
                                 </div>
                                 <p>
-                                    <span>: +44 7754 694900</span>
+                                    <span>: </span><span class="contact-value"
+                                          data-contact="tel"
+                                          data-cc="44"
+                                          data-number="7754 694900"></span>
                                 </p>
                             </div>
 
@@ -706,13 +735,13 @@
 
                         <div class="contact-icons">
                             <div class="contact-icon">
-                                <a href="https://www.linkedin.com/in/osman-turalioglu/" target="_blank" aria-label="LinkedIn">
+                                <a href="https://www.linkedin.com/in/osman-turalioglu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                     <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-linkedin"></use></svg>
                                 </a>
-                                <a href="https://github.com/Osman19702" target="_blank" aria-label="GitHub">
+                                <a href="https://github.com/Osman19702" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                                     <svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg>
                                 </a>
-                                <a href="https://www.instagram.com/oturalioglu/" target="_blank" aria-label="Instagram">
+                                <a href="https://www.instagram.com/oturalioglu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                                     <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-instagram"></use></svg>
                                 </a>
                             </div>

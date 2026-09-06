@@ -62,4 +62,37 @@
             isLight ? "Switch to dark mode" : "Switch to light mode"
         );
     });
+
+    /**
+     * Contact details are stored split across data attributes so the served
+     * HTML contains no address or number a harvester can pattern-match. They
+     * are reassembled here into ordinary clickable links, so a recruiter still
+     * reaches Osman in a single click.
+     *
+     * This stops scrapers that read raw HTML. It does not stop one that runs
+     * JavaScript, and it is not meant to.
+     */
+    document.querySelectorAll("[data-contact]").forEach((holder) => {
+        const kind = holder.dataset.contact;
+        let href = "";
+        let label = "";
+
+        if (kind === "email") {
+            label = `${holder.dataset.user}@${holder.dataset.domain}`;
+            href = `mailto:${label}`;
+        } else if (kind === "tel") {
+            label = `+${holder.dataset.cc} ${holder.dataset.number}`;
+            href = `tel:+${holder.dataset.cc}${holder.dataset.number.replace(/\s/g, "")}`;
+        } else {
+            return;
+        }
+
+        const link = document.createElement("a");
+        link.href = href;
+        link.className = "contact-link";
+        link.textContent = label;
+
+        holder.textContent = "";
+        holder.appendChild(link);
+    });
 })();

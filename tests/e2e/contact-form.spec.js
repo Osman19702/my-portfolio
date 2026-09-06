@@ -114,10 +114,26 @@ test.describe('Contact form', () => {
             await route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
         });
 
-        await configureKey(page);
-        await fillValidly(page);
-        await page.locator('#contact-submit').click(); // no wait: inside the guard window
+        // Typing through the UI can itself outlast the guard window, which made
+        // this test racy. Populate and submit in one synchronous step instead,
+        // so the elapsed time is genuinely bot-like and the assertion is about
+        // the guard rather than about how fast the test runner types.
+        const sent = await page.evaluate(() => {
+            const set = (id, value) => { document.getElementById(id).value = value; };
+            document.querySelector('[name="access_key"]').value = 'test-access-key';
+            set('name', 'Bot');
+            set('email', 'bot@example.com');
+            set('subject', 'Instant');
+            set('message', 'Submitted far faster than a person could type this.');
 
+            const start = performance.now();
+            document.getElementById('contact-form')
+                .dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            return performance.now() - start;
+        });
+
+        expect(sent, 'the submission must land inside the guard window').toBeLessThan(1200);
+        await expect(page.locator('#notification')).toHaveClass(/show/);
         expect(called, 'submissions faster than a human must not be sent').toBe(false);
     });
 

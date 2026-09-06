@@ -48,12 +48,6 @@ test.describe('Links', () => {
     });
 
     test('every link opening a new tab sets rel="noopener noreferrer"', async ({ page }) => {
-        test.fail(
-            true,
-            'KNOWN BUG: all three social links use target="_blank" with no rel attribute, ' +
-            'giving the opened page a window.opener handle back to this one. Fixed by UC-7.'
-        );
-
         const offenders = await page.locator('a[target="_blank"]').evaluateAll((links) =>
             links
                 .filter((a) => {
@@ -74,5 +68,76 @@ test.describe('Links', () => {
         );
 
         expect(unnamed, 'icon-only links with no accessible name').toEqual([]);
+    });
+});
+
+test.describe('Privacy hardening', () => {
+    test('the served HTML contains no harvestable email address', async ({ request }) => {
+        const html = await (await request.get('/')).text();
+        const found = html.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || [];
+
+        expect(found, 'raw HTML must not expose an email address').toEqual([]);
+    });
+
+    test('the served HTML contains no harvestable phone number', async ({ request }) => {
+        const html = await (await request.get('/')).text();
+        const found = html.match(/\+?\(?44\)?[\s-]?7\d{3}[\s-]?\d{3}[\s-]?\d{3}/g) || [];
+
+        expect(found, 'raw HTML must not expose a phone number').toEqual([]);
+    });
+
+    test('the email and phone are still reachable in one click', async ({ page }) => {
+        await page.goto('/');
+        await page.locator('.control[data-id="contact"]').click();
+
+        const mailto = page.locator('a.contact-link[href^="mailto:"]');
+        await expect(mailto).toHaveCount(1);
+        await expect(mailto).toHaveText(/@/);
+
+        const tel = page.locator('a.contact-link[href^="tel:"]');
+        await expect(tel).toHaveCount(1);
+        await expect(tel).toHaveText(/^\+44/);
+    });
+
+    test('the assembled links look like the surrounding text', async ({ page }) => {
+        await page.goto('/');
+        await page.locator('.control[data-id="contact"]').click();
+
+        const link = page.locator('a.contact-link').first();
+        const parentColor = await link.evaluate(
+            (el) => getComputedStyle(el.parentElement).color
+        );
+        await expect(link).toHaveCSS('color', parentColor);
+        await expect(link).toHaveCSS('text-decoration-line', 'none');
+    });
+
+    test('a Content-Security-Policy is declared', async ({ page }) => {
+        await page.goto('/');
+
+        const policy = await page
+            .locator('meta[http-equiv="Content-Security-Policy"]')
+            .getAttribute('content');
+
+        expect(policy).toBeTruthy();
+        // No escape hatches: the page genuinely has no inline script or style.
+        expect(policy).not.toContain ('unsafe');
+        expect(policy).toContain("default-src 'self'");
+        expect(policy).toContain("object-src 'none'");
+        expect(policy).toContain('connect-src https://api.web3forms.com');
+    });
+
+    test('the CSP does not block anything the page needs', async ({ page }) => {
+        const violations = [];
+        page.on('console', (m) => {
+            if (/Content Security Policy|Refused to/i.test(m.text())) {
+                violations.push(m.text());
+            }
+        });
+
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+        await page.locator('.control[data-id="contact"]').click();
+
+        expect(violations).toEqual([]);
     });
 });
