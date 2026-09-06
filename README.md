@@ -17,7 +17,7 @@ small scripts, **no framework and no build step**. The files in the repo root ar
 files the browser gets.
 
 It is also a work sample. The owner is a QA engineer, so the repo carries a real test
-suite — **85 Playwright tests across 8 spec files**, including accessibility scans of
+suite — **86 Playwright tests across 8 spec files**, including accessibility scans of
 every panel in both themes, and they run in CI on every push and pull request.
 
 ## Stack
@@ -146,6 +146,15 @@ Font Awesome Free icons are used under **CC BY 4.0**; the attribution is in the 
 script, an inline style attribute, an inline event handler, or a new external origin
 will be **blocked** until the policy is updated. The single inline script — the pre-paint
 theme setter — is allowed by its `sha256` hash; **if you edit it, regenerate that hash**.
+
+The policy deliberately omits `upgrade-insecure-requests`. It was there briefly and
+took the site down: while GitHub was still provisioning the certificate for the custom
+domain, Pages served over http, and the directive rewrote every same-origin subresource
+to https — into a certificate that did not yet match. The stylesheet and all three
+scripts failed and visitors got unstyled markup. It is redundant now that Pages
+redirects http to https, and it would turn any future certificate lapse from a warning
+into a blank site, so it stays out. A test asserts its absence. Note that the local
+suite cannot catch this class of bug at all: the directive exempts localhost.
 
 ## Known limitations
 
