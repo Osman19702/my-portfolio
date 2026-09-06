@@ -1265,8 +1265,6 @@ section {
   
 }
 
-/*# sourceMappingURL=styles.css.map */
-
 /* Five decorative shapes loop forever, and every panel and heading animates
    in. Honour the OS-level request to stop that. Durations are collapsed
    rather than the animations removed, so fill-mode:both keyframes still
