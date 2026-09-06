@@ -1,26 +1,34 @@
-/* // Select the notification element
-const notification = document.querySelector('#notification');
+/**
+ * Toast notifications for the contact form.
+ *
+ * The container is a live region (role="status", aria-live="polite"), so
+ * replacing its text is what announces the message to a screen reader. The
+ * toast is hidden with visibility rather than opacity alone, so an invisible
+ * box cannot sit over the page swallowing clicks.
+ */
+window.showNotification = (function () {
+    const notification = document.getElementById('notification');
+    const text = document.getElementById('notification-text');
+    let hideTimer = null;
 
-// Define a function to show the notification
-function showNotification(message, type) {
-  // Set the text content of the notification
-  const notificationText = document.querySelector('#notification-text');
-  notificationText.textContent = message;
+    if (!notification || !text) {
+        return function noop() {};
+    }
 
-  // Set the background color of the notification based on the type
-  if (type === 'success') {
-    notification.style.backgroundColor = '#4CAF50';
-  } else if (type === 'error') {
-    notification.style.backgroundColor = '#f44336';
-  } else {
-    notification.style.backgroundColor = '#333';
-  }
+    return function showNotification(message, type) {
+        clearTimeout(hideTimer);
 
-  // Show the notification
-  notification.classList.add('show');
+        text.textContent = message;
+        notification.classList.remove('is-success', 'is-error');
+        notification.classList.add(type === 'success' ? 'is-success' : 'is-error');
+        notification.classList.add('show');
 
-  // Hide the notification after 3 seconds
-  setTimeout(() => {
-    notification.classList.remove('show');
-  }, 3000);
-} */
+        // Errors need reading straight away; a success confirmation can wait
+        // for a natural pause.
+        notification.setAttribute('aria-live', type === 'success' ? 'polite' : 'assertive');
+
+        hideTimer = setTimeout(() => {
+            notification.classList.remove('show');
+        }, type === 'success' ? 5000 : 8000);
+    };
+})();

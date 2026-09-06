@@ -1,2 +1,7 @@
 node_modules/
 applicationsCL/
+# Playwright
+playwright-report/
+test-results/
+/playwright/.cache/
+lighthouse-*.json

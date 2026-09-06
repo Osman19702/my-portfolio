@@ -5,15 +5,31 @@
   list-style: none;
 }
 
+/* Icons are an inline SVG sprite (see scripts/build-icon-sprite.js), not a
+   webfont. Sizing still comes from font-size on the parent rules, because
+   the sprite scales to 1em and inherits colour via currentColor. */
+.icon-sprite {
+  display: none;
+}
+
+.svg-icon {
+  display: inline-block;
+  height: 1em;
+  width: auto;
+  fill: currentColor;
+  flex-shrink: 0;
+  vertical-align: baseline;
+}
+
 :root {
   --color-primary: #191d2b;
-  --color-secondary: #457fe4;
+  --color-secondary: #558ae6;
   --color-white: #FFFFFF;
   --color-black: #000;
   --color-grey0: #f8f8f8;
   --color-grey-1: #dbe1e8;
   --color-grey-2: #b2becd;
-  --color-grey-3: #6c7983;
+  --color-grey-3: #6b7882;
   --color-grey-4: #454e56;
   --color-grey-5: #2a2e35;
   --color-grey-6: #12181b;
@@ -21,15 +37,17 @@
   --box-shadow-1: 0 3px 15px rgba(0,0,0,.3);
 }
 
+/* Applied to <html> by the pre-paint script in index.html, so the custom
+   properties below cascade into <body> before the first paint. */
 .light-mode {
   --color-primary: #FFFFFF;
-  --color-secondary: #0dbae1;
+  --color-secondary: #09809b;
   --color-white: #454e56;
   --color-black: #000;
   --color-grey0: #f8f8f8;
-  --color-grey-1: #6c7983;
-  --color-grey-2: #6c7983;
-  --color-grey-3: #6c7983;
+  --color-grey-1: #6b7882;
+  --color-grey-2: #6b7882;
+  --color-grey-3: #6b7882;
   --color-grey-4: #454e56;
   --color-grey-5: #f8f8f8;
   --color-grey-6: #12181b;
@@ -111,7 +129,7 @@ section {
   margin: 0.7rem 0;
   box-shadow: var(--box-shadow-1);
 }
-.controls .control i {
+.controls .control .svg-icon {
   font-size: 1.2rem;
   color: var(--color-grey-2);
   pointer-events: none;
@@ -120,7 +138,7 @@ section {
   background-color: var(--color-secondary);
   transition: all 0.4s ease-in-out;
 }
-.controls .active-btn i {
+.controls .active-btn .svg-icon {
   color: var(--color-white);
 }
 
@@ -142,10 +160,39 @@ section {
 .theme-btn:active {
   transform: translateY(-3px);
 }
-.theme-btn i {
+.theme-btn .svg-icon {
   font-size: 1.4rem;
   color: var(--color-grey-2);
   pointer-events: none;
+}
+
+/* The tab controls and the theme toggle are real <button>s so they are
+   keyboard operable. These resets keep them looking exactly as they did
+   when they were <div>s. */
+.controls .control,
+.theme-btn {
+  border: none;
+  font: inherit;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.controls .control:focus-visible,
+.theme-btn:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 3px;
+}
+
+/* Panels are focusable so keyboard users can scroll them, but they should
+   not show a focus ring when revealed by a click. */
+.container:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: -3px;
+}
+
+.container:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /*Header animations*/
@@ -327,7 +374,7 @@ section {
   padding: 1rem;
   color: var(--color-grey-1);
 }
-.about-container .left-about h4 {
+.about-container .left-about h3 {
   font-size: 2rem;
   text-transform: uppercase;
 }
@@ -465,7 +512,7 @@ section {
   color: var(--color-secondary);
   font-size: 1.1rem;
 }
-.cert-body h5 {
+.cert-body h3 {
   font-size: 0.88rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -484,7 +531,7 @@ section {
   color: var(--color-grey-2);
   margin-bottom: 0.15rem;
 }
-.cert-meta i {
+.cert-meta .svg-icon {
   margin-right: 0.35rem;
   font-size: 0.65rem;
   opacity: 0.6;
@@ -522,7 +569,7 @@ section {
   width: 100%;
   box-sizing: border-box;
 }
-.uk-work-badge i {
+.uk-work-badge .svg-icon {
   margin-right: 0.5rem;
   font-size: 1.15rem;
 }
@@ -551,7 +598,7 @@ section {
   background: rgba(255,255,255,0.08);
   transform: translateX(3px);
 }
-.cap-item i {
+.cap-item .svg-icon {
   color: var(--color-secondary);
   font-size: 1rem;
   margin-top: 0.15rem;
@@ -610,7 +657,7 @@ section {
   margin-bottom: 1rem;
   position: relative;
 }
-.vtl-period i {
+.vtl-period .svg-icon {
   position: absolute;
   left: -38px;
   top: 50%;
@@ -669,7 +716,7 @@ section {
   background: rgba(241, 196, 15, 0.2);
   color: #f5d76e;
 }
-.vtl-card h5 {
+.vtl-card h4 {
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -695,83 +742,6 @@ section {
   color: var(--color-grey-2);
   line-height: 1.55;
 }
-
-
-.port-text {
-  padding: 2rem 0;
-  text-align: center;
-}
-
-/* .portfolios {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 2rem;
-  margin-top: 3rem;
-}
-.portfolios .portfolio-item {
-  position: relative;
-  border-radius: 15px;
-}
-.portfolios .portfolio-item img {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 15px;
-}
-.portfolios .portfolio-item .hover-items {
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-secondary);
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  opacity: 0;
-  transform: scale(0);
-  transition: all 0.4s ease-in-out;
-}
-.portfolios .portfolio-item .hover-items h3 {
-  font-size: 1.5rem;
-  color: var(--color-white);
-  margin-bottom: 1.5rem;
-}
-.portfolios .portfolio-item .hover-items .icons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.portfolios .portfolio-item .hover-items .icons .icon {
-  background-color: var(--color-primary);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 1rem;
-  cursor: pointer;
-  transition: all 0.4s ease-in-out;
-}
-.portfolios .portfolio-item .hover-items .icons .icon i {
-  font-size: 1.5rem;
-  color: var(--color-white);
-  margin: 0 1rem;
-}
-.portfolios .portfolio-item .hover-items .icons .icon:hover {
-  background-color: var(--color-white);
-}
-.portfolios .portfolio-item .hover-items .icons .icon:hover i {
-  color: var(--color-primary);
-}
-
-.portfolio-item:hover .hover-items {
-  opacity: 1;
-  transform: scale(1);
-} */
 
 /* .blogs {
   display: grid;
@@ -854,7 +824,7 @@ section {
   display: grid;
   grid-template-columns: 40px 1fr;
 }
-.contact-content-con .left-contact .contact-info .contact-item .icon i {
+.contact-content-con .left-contact .contact-info .contact-item .icon .svg-icon {
   display: flex;
   align-items: center;
   font-size: 1.3rem;
@@ -879,10 +849,10 @@ section {
 .contact-content-con .left-contact .contact-icon a:hover {
   background-color: var(--color-secondary);
 }
-.contact-content-con .left-contact .contact-icon a:hover i {
+.contact-content-con .left-contact .contact-icon a:hover .svg-icon {
   color: var(--color-primary);
 }
-.contact-content-con .left-contact .contact-icon a i {
+.contact-content-con .left-contact .contact-icon a .svg-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -911,7 +881,7 @@ section {
 .contact-content-con .right-contact .i-c-2 {
   display: flex;
 }
-.contact-content-con .right-contact .i-c-2 :last-child {
+.contact-content-con .right-contact .i-c-2 > :last-child {
   margin-left: 1.5rem;
 }
 .contact-content-con .right-contact .submit-btn {
@@ -968,7 +938,7 @@ section {
 }
 
 .submit-button {
-  background-color: #457fe4; /* Set background color */
+  background-color: #3171e1; /* AA with white text (4.59:1) */
   border: none; /* Remove button border */
   color: white; /* Set button text color */
   padding: 12px 24px; /* Set padding */
@@ -980,7 +950,7 @@ section {
   border-radius: 4px; /* Add rounded corners */
 }
 .submit-button:hover {
-  background-color: #1461e6; /* Change background color on hover */
+  background-color: #245fc9; /* darker still on hover */
   cursor: pointer; /* Change cursor to pointer on hover */
 }
 
@@ -995,14 +965,26 @@ section {
   background-color: #333;
   color: #fff;
   border-radius: 5px;
+  max-width: min(90vw, 380px);
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  /* visibility as well as opacity: an invisible box still catches clicks. */
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+}
+
+#notification.is-success {
+  background-color: #1e7a45;
+}
+
+#notification.is-error {
+  background-color: #a32b2b;
 }
 
 #notification.show {
   opacity: 1;
+  visibility: visible;
 }
-
 
 .main-title {
   text-align: center;
@@ -1111,12 +1093,6 @@ section {
     grid-template-columns: 1fr;
   }
 
-  .portfolios {
-    grid-template-columns: repeat(1, 1fr);
-    padding-bottom: 6rem;
-    margin-top: 1rem;
-  }
-
   .blogs {
     grid-template-columns: repeat(1, 1fr);
     padding-bottom: 6rem;
@@ -1134,7 +1110,7 @@ section {
     flex-direction: column;
   }
 
-  .contact-content-con .right-contact .i-c-2 :last-child {
+  .contact-content-con .right-contact .i-c-2 > :last-child {
     margin-left: 0;
     margin-top: 1.5rem;
   }
@@ -1185,7 +1161,7 @@ section {
     flex-direction: column;
   }
 
-  .contact-content-con .right-contact .i-c-2 :last-child {
+  .contact-content-con .right-contact .i-c-2 > :last-child {
     margin-left: 0;
     margin-top: 1.5rem;
   }
@@ -1204,10 +1180,6 @@ section {
     margin-top: 6rem;
   }
 
-  .portfolios {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .header-content .right-header {
     padding-right: 9rem;
   }
@@ -1217,9 +1189,6 @@ section {
     grid-template-columns: repeat(1, 1fr);
   }
 
-  .portfolios {
-    grid-template-columns: repeat(1, 1fr);
-  }
 }
 @media screen and (max-width: 1070px) {
   .about-container {
@@ -1298,4 +1267,115 @@ section {
   
 }
 
-/*# sourceMappingURL=styles.css.map */
+/* Five decorative shapes loop forever, and every panel and heading animates
+   in. Honour the OS-level request to stop that. Durations are collapsed
+   rather than the animations removed, so fill-mode:both keyframes still
+   settle on their end state instead of leaving elements invisible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Contact form ------------------------------------------------------ */
+
+/* Labels exist for screen readers; the visible cue stays the placeholder, so
+   the original design is unchanged. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Honeypot: positioned away rather than display:none, which some bots detect. */
+.hp-field {
+  position: absolute !important;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.right-contact .i-c-2 .field {
+  flex: 1;
+  min-width: 0;
+}
+
+.right-contact .field-error {
+  display: block;
+  min-height: 1.2em;
+  padding: 0.35rem 1.1rem 0;
+  font-size: 0.85rem;
+  color: #ff8a8a;
+}
+
+/* The inputs set outline:none, which leaves keyboard users with no focus cue.
+   Restore one that is visible in both themes. */
+.right-contact .input-control input:focus-visible,
+.right-contact .input-control textarea:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.right-contact .input-control input.is-invalid,
+.right-contact .input-control textarea.is-invalid {
+  box-shadow: inset 0 0 0 2px #ff8a8a;
+}
+
+.submit-button:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.submit-button:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 3px;
+}
+
+/* Assembled contact links inherit the surrounding text so the design is
+   unchanged, while still being one click for a recruiter. */
+.contact-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.contact-link:hover,
+.contact-link:focus-visible {
+  text-decoration: underline;
+}
+
+.contact-link:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* Off-screen until focused, then parked top-left over everything. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--br-sm-2) 0;
+}
+
+.skip-link:focus {
+  left: 0;
+}
