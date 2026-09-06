@@ -75,6 +75,22 @@ test.describe('Accessibility (axe-core)', () => {
         expect(summarise(blocking)).toEqual([]);
     });
 
+    // Hidden panels are skipped by axe, so each one has to be revealed and
+    // scanned in its own right. Without this the contact form - the only
+    // interactive content on the site - would never be audited at all.
+    for (const panel of ['about', 'certifications', 'contact']) {
+        test(`the ${panel} panel has no critical or serious violations`, async ({ page }) => {
+            await page.goto('/');
+            await settled(page, 'dark');
+
+            await page.locator(`.control[data-id="${panel}"]`).click();
+            await expect(page.locator(`#${panel}`)).toHaveAttribute('class', /(?:^|\s)active(?:\s|$)/);
+
+            const blocking = await scan(page);
+            expect(summarise(blocking)).toEqual([]);
+        });
+    }
+
     test('the page has exactly one h1', async ({ page }) => {
         await page.goto('/');
         await expect(page.locator('h1')).toHaveCount(1);

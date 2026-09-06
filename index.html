@@ -712,37 +712,76 @@
                                 <a href="https://github.com/Osman19702" target="_blank" aria-label="GitHub">
                                     <svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg>
                                 </a>
-                                <a href="https://www.instagram.com/oturalioglu/" target="_blank">
+                                <a href="https://www.instagram.com/oturalioglu/" target="_blank" aria-label="Instagram">
                                     <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-instagram"></use></svg>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!--
                     <div class="right-contact">
-                        <form action="/submit-form" method="post" class="contact-form" id="contact-form">
+                        <form class="contact-form" id="contact-form" novalidate>
+                            <!--
+                              Web3Forms delivers the message; GitHub Pages cannot run server code.
+                              The access key is public by design - it names the destination inbox
+                              and is not a secret. Get one emailed to you at https://web3forms.com
+                              and replace the placeholder below. Until then the form validates and
+                              reports a clear error instead of silently doing nothing.
+                            -->
+                            <input type="hidden" name="access_key" value="WEB3FORMS_ACCESS_KEY_HERE">
+                            <input type="hidden" name="subject" value="New message from osmanturalioglu.com">
+                            <input type="hidden" name="from_name" value="osmanturalioglu.com">
+
+                            <!-- Honeypot: off-screen and skipped by Tab, so only a bot fills it.
+                                 It still carries a label - an unlabelled form control is a
+                                 critical failure even when nobody is meant to use it. -->
+                            <label class="sr-only" for="botcheck">Leave this field empty</label>
+                            <input type="checkbox" id="botcheck" name="botcheck" class="hp-field"
+                                   tabindex="-1" autocomplete="off">
+
                             <div class="input-control i-c-2">
-                                <input type="text" required placeholder="YOUR NAME" id="name" name="name">
-                                <input type="email" required placeholder="YOUR EMAIL" id="email" name="email">
+                                <div class="field">
+                                    <label class="sr-only" for="name">Your name</label>
+                                    <input type="text" id="name" name="name" placeholder="YOUR NAME"
+                                           required autocomplete="name" aria-describedby="name-error">
+                                    <span class="field-error" id="name-error"></span>
+                                </div>
+                                <div class="field">
+                                    <label class="sr-only" for="email">Your email address</label>
+                                    <input type="email" id="email" name="email" placeholder="YOUR EMAIL"
+                                           required autocomplete="email" aria-describedby="email-error">
+                                    <span class="field-error" id="email-error"></span>
+                                </div>
                             </div>
+
                             <div class="input-control">
-                                <input type="text" required placeholder="ENTER SUBJECT" id="subject" name="subject">
+                                <div class="field">
+                                    <label class="sr-only" for="subject">Subject</label>
+                                    <input type="text" id="subject" name="subject" placeholder="ENTER SUBJECT"
+                                           required aria-describedby="subject-error">
+                                    <span class="field-error" id="subject-error"></span>
+                                </div>
                             </div>
+
                             <div class="input-control">
-                                <textarea name="message" id="message" cols="15" rows="8" placeholder="Message Here..."></textarea>
+                                <div class="field">
+                                    <label class="sr-only" for="message">Your message</label>
+                                    <textarea id="message" name="message" cols="15" rows="8" required
+                                              placeholder="Message Here..." aria-describedby="message-error"></textarea>
+                                    <span class="field-error" id="message-error"></span>
+                                </div>
                             </div>
+
                             <div class="submit-btn">
                                 <button type="submit" class="submit-button" id="contact-submit">Submit Message</button>
                             </div>
                         </form>
                     </div>
-                    -->
                 </div>
             </div>
 
             <div id="notification-container">
-                <div id="notification" class="hidden">
+                <div id="notification" role="status" aria-live="polite">
                     <p id="notification-text"></p>
                 </div>
             </div>
@@ -773,5 +812,7 @@
     </button>
 
     <script src="app.js"></script>
+    <script src="notification.js"></script>
+    <script src="form-submission.js"></script>
 </body>
 </html>

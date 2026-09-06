@@ -879,7 +879,7 @@ section {
 .contact-content-con .right-contact .i-c-2 {
   display: flex;
 }
-.contact-content-con .right-contact .i-c-2 :last-child {
+.contact-content-con .right-contact .i-c-2 > :last-child {
   margin-left: 1.5rem;
 }
 .contact-content-con .right-contact .submit-btn {
@@ -963,12 +963,25 @@ section {
   background-color: #333;
   color: #fff;
   border-radius: 5px;
+  max-width: min(90vw, 380px);
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  /* visibility as well as opacity: an invisible box still catches clicks. */
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+}
+
+#notification.is-success {
+  background-color: #1e7a45;
+}
+
+#notification.is-error {
+  background-color: #a32b2b;
 }
 
 #notification.show {
   opacity: 1;
+  visibility: visible;
 }
 
 .main-title {
@@ -1095,7 +1108,7 @@ section {
     flex-direction: column;
   }
 
-  .contact-content-con .right-contact .i-c-2 :last-child {
+  .contact-content-con .right-contact .i-c-2 > :last-child {
     margin-left: 0;
     margin-top: 1.5rem;
   }
@@ -1146,7 +1159,7 @@ section {
     flex-direction: column;
   }
 
-  .contact-content-con .right-contact .i-c-2 :last-child {
+  .contact-content-con .right-contact .i-c-2 > :last-child {
     margin-left: 0;
     margin-top: 1.5rem;
   }
@@ -1269,4 +1282,65 @@ section {
     transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ---- Contact form ------------------------------------------------------ */
+
+/* Labels exist for screen readers; the visible cue stays the placeholder, so
+   the original design is unchanged. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Honeypot: positioned away rather than display:none, which some bots detect. */
+.hp-field {
+  position: absolute !important;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.right-contact .i-c-2 .field {
+  flex: 1;
+  min-width: 0;
+}
+
+.right-contact .field-error {
+  display: block;
+  min-height: 1.2em;
+  padding: 0.35rem 1.1rem 0;
+  font-size: 0.85rem;
+  color: #ff8a8a;
+}
+
+/* The inputs set outline:none, which leaves keyboard users with no focus cue.
+   Restore one that is visible in both themes. */
+.right-contact .input-control input:focus-visible,
+.right-contact .input-control textarea:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.right-contact .input-control input.is-invalid,
+.right-contact .input-control textarea.is-invalid {
+  box-shadow: inset 0 0 0 2px #ff8a8a;
+}
+
+.submit-button:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.submit-button:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 3px;
 }

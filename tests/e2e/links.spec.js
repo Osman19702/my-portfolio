@@ -67,12 +67,6 @@ test.describe('Links', () => {
     });
 
     test('every social link exposes an accessible name', async ({ page }) => {
-        test.fail(
-            true,
-            'KNOWN BUG: the Instagram link is icon-only with no aria-label, so a screen ' +
-            'reader announces it as an unlabelled link. Fixed by UC-7.'
-        );
-
         const unnamed = await page.locator('.contact-icon a').evaluateAll((links) =>
             links
                 .filter((a) => !(a.getAttribute('aria-label') || a.textContent || '').trim())
