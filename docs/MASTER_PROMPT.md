@@ -22,8 +22,9 @@ A broken or untested portfolio contradicts the CV it is advertising.
 
 GROUND TRUTH — read these before proposing anything
 - Static site, no framework, no build step. Served straight from the repo root.
-  index.html (~745 lines)  — entire page, single file, all sections inline
-  styles/styles.css (~1238 lines) — the LIVE stylesheet, linked by index.html
+  index.html (~790 lines)  — entire page, single file, all sections inline.
+    Includes an inline SVG icon sprite; regenerate with `npm run build:icons`.
+  styles/styles.css (~1264 lines) — the LIVE stylesheet, linked by index.html
   styles/styles.scss (~109 lines) + styles.css.map — STALE. See TRAPS.
   app.js (~65 lines) — tab switching (ARIA tabs + roving tabindex) and theme toggle
   form-submission.js, notification.js — 100% commented out, still <script>-included
@@ -40,7 +41,14 @@ GROUND TRUTH — read these before proposing anything
   app.js reads `data-id` off `.control` buttons and toggles `.active` on `#<data-id>`.
   Section ids: #home #about #certifications #contact (four; #portfolio was removed).
   The controls are <button role="tab"> with a roving tabindex - preserve that.
-- External deps: Font Awesome 5.15.4 (cdnjs, with SRI), Google Fonts Poppins.
+- External deps: Google Fonts Poppins ONLY. Font Awesome was removed in favour of
+  an inline SVG sprite; do not reintroduce the CDN stylesheet.
+- All five Poppins weights (400/500/600/700/800) are genuinely used in CSS.
+  None can be dropped - this was checked.
+- Do NOT add rel=preload for the Google font files. It was measured (LCP -157ms
+  for one preload) and rejected: the URLs pin Poppins v24 and will 404 silently
+  when Google rotates, which also fails the CI no-4xx check for an external
+  reason. Revisit only with a self-hosted font.
 
 HARD CONSTRAINTS — violating any of these is a failed task
 1. Do not break the deploy. The site must remain a set of static files servable from the
@@ -370,10 +378,11 @@ Found by reading the repo; each is real and reproducible today.
 | 6 | `styles.scss` (109 ln) stale vs `styles.css` (1300 ln) | styles/ | Recompiling destroys the site |
 | 7 | ~~No description, canonical, OG, favicon, robots, sitemap, JSON-LD~~ **FIXED** (2c779f9) | - | Not yet validated against live crawlers |
 | 8 | ~~`npm test` exits 1 by design~~ **FIXED** (d71b611) - 49 Playwright tests across 7 specs | - | - |
-| 9 | Two `<script>` tags load fully-commented files | index.html:621-622 | Wasted requests |
+| 9 | ~~Two `<script>` tags load fully-commented files~~ **FIXED** (2798137) | - | - |
 | 10 | Theme choice not persisted, ignores `prefers-color-scheme` | app.js | Resets every visit |
 | 11 | At 360px `div.header-content` is a 280px box holding 287px of content behind `overflow-x:hidden`, cutting off the hero heading. The page does NOT scroll sideways | styles.css | Hero unreadable on small phones; confirmed pre-existing at HEAD |
 | 12 | Light-mode accent `#0dbae1` on `#ffffff` measures **2.3:1**, below the 3:1 WCAG 1.4.3 minimum for large text | styles.css:26 | Confirmed by axe; hits the "Osman." span in the hero h1 |
 | 13 | `styles.scss` palette (`#27ae60`) diverges from live `styles.css` (`#457fe4`) | styles/ | Any colour sourced from the SCSS is off-brand |
 | 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css:43 | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
 | 15 | A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it | styles.css:~705, ~1130, ~1210 | Same abandoned-scaffold pattern as #portfolio; left in place as out of scope |
+| 16 | `tests/static-server.js` resolved its root from `__dirname/..`, so `cd`-ing elsewhere still served the repo root - it silently invalidated a before/after comparison | fixed (2798137) | Now honours `STATIC_ROOT`; always verify two servers serve different builds before trusting a diff |
