@@ -59,13 +59,6 @@ test.describe('Accessibility (axe-core)', () => {
     });
 
     test('light mode has no critical or serious violations', async ({ page }) => {
-        test.fail(
-            true,
-            'KNOWN BUG (backlog #12): in light mode the accent --color-secondary #0dbae1 ' +
-            'on #ffffff measures 2.3:1 where WCAG 1.4.3 requires 3:1 for large text. It ' +
-            'hits the "Osman." span in the hero h1. Fixed by UC-6.'
-        );
-
         await page.goto('/');
         await page.locator('.theme-btn').click();
         await expect(page.locator('body')).toHaveClass(/light-mode/);
@@ -99,5 +92,63 @@ test.describe('Accessibility (axe-core)', () => {
     test('the document declares a language', async ({ page }) => {
         await page.goto('/');
         await expect(page.locator('html')).toHaveAttribute('lang', /\w/);
+    });
+});
+
+test.describe('Document structure (WCAG 1.3.1, 2.4.1)', () => {
+    test.beforeEach(async ({ page }) => {
+        await page.goto('/');
+    });
+
+    test('heading levels never skip', async ({ page }) => {
+        const levels = await page.locator('h1,h2,h3,h4,h5,h6').evaluateAll(
+            (nodes) => nodes.map((n) => Number(n.tagName[1]))
+        );
+
+        expect(levels[0], 'the document should start at h1').toBe(1);
+        for (let i = 1; i < levels.length; i += 1) {
+            expect(
+                levels[i] - levels[i - 1],
+                `h${levels[i - 1]} is followed by h${levels[i]}`
+            ).toBeLessThanOrEqual(1);
+        }
+    });
+
+    test('decorative heading text is hidden from assistive tech', async ({ page }) => {
+        // .bg-text is a large watermark behind each title. Left visible to the
+        // accessibility tree it ran into the real heading: "About memy stats".
+        for (const [panel, expected] of [
+            ['about', 'About me'],
+            ['certifications', 'Licenses & Certifications'],
+            ['contact', 'Contact Me'],
+        ]) {
+            await page.locator(`.control[data-id="${panel}"]`).click();
+            const snapshot = await page.locator(`#${panel} .main-title h2`).first().ariaSnapshot();
+            expect(snapshot).toContain(`heading "${expected}"`);
+        }
+    });
+
+    test('a skip link is the first thing in the tab order', async ({ page }) => {
+        await page.keyboard.press('Tab');
+
+        const focused = await page.evaluate(() => ({
+            cls: document.activeElement.className,
+            href: document.activeElement.getAttribute('href'),
+        }));
+        expect(focused.cls).toContain('skip-link');
+        expect(focused.href).toBe('#tab-home');
+    });
+
+    test('the skip link is invisible until focused', async ({ page }) => {
+        const link = page.locator('.skip-link');
+
+        expect((await link.boundingBox()).x).toBeLessThan(-1000);
+        await link.focus();
+        expect((await link.boundingBox()).x).toBeGreaterThanOrEqual(0);
+    });
+
+    test('the page exposes navigation and main landmarks', async ({ page }) => {
+        await expect(page.locator('nav[aria-label]')).toHaveCount(1);
+        await expect(page.locator('main')).toHaveCount(1);
     });
 });
