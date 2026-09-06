@@ -52,15 +52,51 @@
         select(tabs[target], { moveFocus: true });
     });
 
+    /**
+     * Theme. The class lives on <html>, not <body>, so the pre-paint script in
+     * <head> can apply it before <body> exists and avoid a flash of the wrong
+     * theme. That script handles the stored choice and the OS preference on
+     * first visit; this only has to keep the button in step and remember an
+     * explicit choice.
+     */
     const themeBtn = document.querySelector(".theme-btn");
+    const root = document.documentElement;
 
-    themeBtn.addEventListener("click", () => {
-        const isLight = document.body.classList.toggle("light-mode");
+    function syncThemeButton() {
+        const isLight = root.classList.contains("light-mode");
         themeBtn.setAttribute("aria-pressed", String(isLight));
         themeBtn.setAttribute(
             "aria-label",
             isLight ? "Switch to dark mode" : "Switch to light mode"
         );
+    }
+
+    syncThemeButton();
+
+    themeBtn.addEventListener("click", () => {
+        const isLight = root.classList.toggle("light-mode");
+        try {
+            localStorage.setItem("theme", isLight ? "light" : "dark");
+        } catch (error) {
+            // Private browsing or blocked storage: the toggle still works for
+            // this visit, it just will not be remembered.
+        }
+        syncThemeButton();
+    });
+
+    // Follow the OS if the visitor has never chosen explicitly.
+    window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
+        let stored = null;
+        try {
+            stored = localStorage.getItem("theme");
+        } catch (error) {
+            stored = null;
+        }
+        if (stored) {
+            return;
+        }
+        root.classList.toggle("light-mode", event.matches);
+        syncThemeButton();
     });
 
     /**

@@ -22,7 +22,19 @@
           cannot cover anything earlier in the document.
       Both would be fixed by moving to a host that sets response headers.
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com; upgrade-insecure-requests">
+
+    <!--
+      Applied before first paint so a returning visitor never sees a flash of
+      the wrong theme. Inline by necessity: an external file would not be
+      fetched and executed in time. Allowed by the CSP through its sha256 hash
+      rather than by opening the policy to 'unsafe-inline'.
+
+      If you edit this script you MUST regenerate the hash in the CSP above,
+      or the browser will silently refuse to run it. The "CSP does not block
+      anything the page needs" test in tests/e2e/links.spec.js catches that.
+    -->
+    <script>(function(){try{var t=localStorage.getItem("theme");if(t==="light"||(!t&&window.matchMedia("(prefers-color-scheme: light)").matches)){document.documentElement.classList.add("light-mode");}}catch(e){}})();</script>
 
     <!-- Primary meta -->
     <meta name="description" content="Senior QA Engineer in High Wycombe, UK. ISTQB CT-AI and CTAL-TAE certified, specialising in Playwright, API automation and AI-assisted testing.">

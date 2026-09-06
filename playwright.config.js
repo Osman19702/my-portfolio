@@ -18,6 +18,13 @@ module.exports = defineConfig({
 
     use: {
         baseURL: BASE_URL,
+
+        // The site now honours prefers-color-scheme on a first visit, and
+        // Playwright's own default is light. Pin the baseline to dark so
+        // "starts in dark mode" means something; the tests that care about
+        // the light preference set it explicitly with emulateMedia.
+        colorScheme: 'dark',
+
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
     },

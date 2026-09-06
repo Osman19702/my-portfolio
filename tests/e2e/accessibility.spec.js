@@ -61,7 +61,7 @@ test.describe('Accessibility (axe-core)', () => {
     test('light mode has no critical or serious violations', async ({ page }) => {
         await page.goto('/');
         await page.locator('.theme-btn').click();
-        await expect(page.locator('body')).toHaveClass(/light-mode/);
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
         await settled(page, 'light');
 
         const blocking = await scan(page);

@@ -1,8 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
 /**
- * Theme is a single class on <body>. Dark is the default; `.light-mode`
- * redefines the CSS custom properties that everything else reads from.
+ * Theme is a single class on <html>, not <body>, so the pre-paint script in
+ * <head> can apply it before <body> exists. Dark is the default; `.light-mode`
+ * redefines the CSS custom properties everything else reads from.
  */
 test.describe('Theme toggle', () => {
     test.beforeEach(async ({ page }) => {
@@ -10,21 +11,18 @@ test.describe('Theme toggle', () => {
     });
 
     test('the page starts in dark mode', async ({ page }) => {
-        await expect(page.locator('body')).not.toHaveClass(/light-mode/);
+        await expect(page.locator('html')).not.toHaveClass(/light-mode/);
     });
 
     test('the toggle switches to light mode and back', async ({ page }) => {
-        // Arrange
         const toggle = page.locator('.theme-btn');
-        const body = page.locator('body');
+        const root = page.locator('html');
 
-        // Act / Assert - on
         await toggle.click();
-        await expect(body).toHaveClass(/light-mode/);
+        await expect(root).toHaveClass(/light-mode/);
 
-        // Act / Assert - and off again
         await toggle.click();
-        await expect(body).not.toHaveClass(/light-mode/);
+        await expect(root).not.toHaveClass(/light-mode/);
     });
 
     test('light mode actually repaints the page background', async ({ page }) => {
@@ -34,9 +32,8 @@ test.describe('Theme toggle', () => {
         const dark = await backgroundOf();
         await page.locator('.theme-btn').click();
 
-        // body carries `transition: all 0.4s` (styles.css:43), so the computed
-        // colour is still the old one for a few frames after the click. Poll
-        // rather than sleeping a fixed amount.
+        // body carries `transition: all 0.4s` (styles.css), so the computed
+        // colour is still the old one for a few frames after the click.
         await expect
             .poll(backgroundOf, { message: 'background should change with the theme' })
             .not.toBe(dark);
@@ -61,23 +58,85 @@ test.describe('Theme toggle', () => {
 
         await toggle.focus();
         await page.keyboard.press('Enter');
-        await expect(page.locator('body')).toHaveClass(/light-mode/);
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
 
         await page.keyboard.press(' ');
-        await expect(page.locator('body')).not.toHaveClass(/light-mode/);
+        await expect(page.locator('html')).not.toHaveClass(/light-mode/);
     });
+});
 
-    test('the chosen theme survives a reload', async ({ page }) => {
-        test.fail(
-            true,
-            'KNOWN BUG (backlog #10): the theme is a body class only. It is never ' +
-            'persisted, so every visit resets to dark. Fixed by UC-9.'
-        );
-
+test.describe('Theme persistence', () => {
+    test('an explicit choice survives a reload', async ({ page }) => {
+        await page.goto('/');
         await page.locator('.theme-btn').click();
-        await expect(page.locator('body')).toHaveClass(/light-mode/);
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
 
         await page.reload();
-        await expect(page.locator('body')).toHaveClass(/light-mode/);
+
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
+        await expect(page.locator('.theme-btn')).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    test('choosing dark also persists, and is not mistaken for "no choice"', async ({ page }) => {
+        // With the OS asking for light, an explicit dark choice must win.
+        await page.emulateMedia({ colorScheme: 'light' });
+        await page.goto('/');
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
+
+        await page.locator('.theme-btn').click();
+        await expect(page.locator('html')).not.toHaveClass(/light-mode/);
+
+        await page.reload();
+        await expect(page.locator('html')).not.toHaveClass(/light-mode/);
+    });
+
+    test('a first-time visitor gets the theme their OS asks for', async ({ page }) => {
+        await page.emulateMedia({ colorScheme: 'light' });
+        await page.goto('/');
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
+
+        await page.emulateMedia({ colorScheme: 'dark' });
+        await page.goto('/');
+        await expect(page.locator('html')).not.toHaveClass(/light-mode/);
+    });
+
+    test('the theme is applied before the first paint, with no flash', async ({ page }) => {
+        await page.goto('/');
+        await page.locator('.theme-btn').click();
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
+
+        // Sample the class at the earliest moment a document script can run.
+        // If the theme were applied later, this would come back false and the
+        // visitor would see a dark frame before the light one.
+        await page.addInitScript(() => {
+            window.__themeAtStart = null;
+            document.addEventListener('readystatechange', () => {
+                if (window.__themeAtStart === null) {
+                    window.__themeAtStart = document.documentElement.className;
+                }
+            }, { once: true });
+        });
+        await page.reload();
+
+        const atStart = await page.evaluate(() => window.__themeAtStart);
+        expect(atStart, 'theme class must be present at the first readystatechange')
+            .toContain('light-mode');
+    });
+
+    test('a blocked localStorage does not break the toggle', async ({ page }) => {
+        await page.addInitScript(() => {
+            Object.defineProperty(window, 'localStorage', {
+                get() { throw new Error('storage blocked'); },
+            });
+        });
+
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+
+        await page.goto('/');
+        await page.locator('.theme-btn').click();
+
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
+        expect(errors, 'blocked storage must be caught, not thrown').toEqual([]);
     });
 });
