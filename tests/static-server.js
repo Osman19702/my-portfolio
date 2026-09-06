@@ -9,7 +9,11 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.resolve(__dirname, '..');
+// STATIC_ROOT lets a caller serve a different tree (e.g. a checkout of an
+// older commit) for before/after comparisons. Defaults to the repo root.
+const ROOT = process.env.STATIC_ROOT
+    ? path.resolve(process.env.STATIC_ROOT)
+    : path.resolve(__dirname, '..');
 const PORT = Number(process.env.PORT) || 4173;
 
 const MIME = {

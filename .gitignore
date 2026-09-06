@@ -4,3 +4,4 @@ applicationsCL/
 playwright-report/
 test-results/
 /playwright/.cache/
+lighthouse-*.json

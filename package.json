@@ -9,7 +9,9 @@
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:a11y": "playwright test accessibility",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "perf": "node tests/lighthouse.js",
+    "build:icons": "node scripts/build-icon-sprite.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,8 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.63.0"
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@playwright/test": "^1.63.0",
+    "lighthouse": "^13.4.1"
   }
 }

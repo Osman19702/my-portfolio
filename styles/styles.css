@@ -5,6 +5,22 @@
   list-style: none;
 }
 
+/* Icons are an inline SVG sprite (see scripts/build-icon-sprite.js), not a
+   webfont. Sizing still comes from font-size on the parent rules, because
+   the sprite scales to 1em and inherits colour via currentColor. */
+.icon-sprite {
+  display: none;
+}
+
+.svg-icon {
+  display: inline-block;
+  height: 1em;
+  width: auto;
+  fill: currentColor;
+  flex-shrink: 0;
+  vertical-align: baseline;
+}
+
 :root {
   --color-primary: #191d2b;
   --color-secondary: #457fe4;
@@ -111,7 +127,7 @@ section {
   margin: 0.7rem 0;
   box-shadow: var(--box-shadow-1);
 }
-.controls .control i {
+.controls .control .svg-icon {
   font-size: 1.2rem;
   color: var(--color-grey-2);
   pointer-events: none;
@@ -120,7 +136,7 @@ section {
   background-color: var(--color-secondary);
   transition: all 0.4s ease-in-out;
 }
-.controls .active-btn i {
+.controls .active-btn .svg-icon {
   color: var(--color-white);
 }
 
@@ -142,7 +158,7 @@ section {
 .theme-btn:active {
   transform: translateY(-3px);
 }
-.theme-btn i {
+.theme-btn .svg-icon {
   font-size: 1.4rem;
   color: var(--color-grey-2);
   pointer-events: none;
@@ -513,7 +529,7 @@ section {
   color: var(--color-grey-2);
   margin-bottom: 0.15rem;
 }
-.cert-meta i {
+.cert-meta .svg-icon {
   margin-right: 0.35rem;
   font-size: 0.65rem;
   opacity: 0.6;
@@ -551,7 +567,7 @@ section {
   width: 100%;
   box-sizing: border-box;
 }
-.uk-work-badge i {
+.uk-work-badge .svg-icon {
   margin-right: 0.5rem;
   font-size: 1.15rem;
 }
@@ -580,7 +596,7 @@ section {
   background: rgba(255,255,255,0.08);
   transform: translateX(3px);
 }
-.cap-item i {
+.cap-item .svg-icon {
   color: var(--color-secondary);
   font-size: 1rem;
   margin-top: 0.15rem;
@@ -639,7 +655,7 @@ section {
   margin-bottom: 1rem;
   position: relative;
 }
-.vtl-period i {
+.vtl-period .svg-icon {
   position: absolute;
   left: -38px;
   top: 50%;
@@ -806,7 +822,7 @@ section {
   display: grid;
   grid-template-columns: 40px 1fr;
 }
-.contact-content-con .left-contact .contact-info .contact-item .icon i {
+.contact-content-con .left-contact .contact-info .contact-item .icon .svg-icon {
   display: flex;
   align-items: center;
   font-size: 1.3rem;
@@ -831,10 +847,10 @@ section {
 .contact-content-con .left-contact .contact-icon a:hover {
   background-color: var(--color-secondary);
 }
-.contact-content-con .left-contact .contact-icon a:hover i {
+.contact-content-con .left-contact .contact-icon a:hover .svg-icon {
   color: var(--color-primary);
 }
-.contact-content-con .left-contact .contact-icon a i {
+.contact-content-con .left-contact .contact-icon a .svg-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1237,3 +1253,20 @@ section {
 }
 
 /*# sourceMappingURL=styles.css.map */
+
+/* Five decorative shapes loop forever, and every panel and heading animates
+   in. Honour the OS-level request to stop that. Durations are collapsed
+   rather than the animations removed, so fill-mode:both keyframes still
+   settle on their end state instead of leaving elements invisible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
