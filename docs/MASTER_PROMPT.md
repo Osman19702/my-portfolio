@@ -384,16 +384,17 @@ Found by reading the repo; each is real and reproducible today.
 | 3 | ~~`img/img1.jpg` (1.6 MB) referenced nowhere~~ **FIXED** (3593e08) - deleted | - | - |
 | 4 | ~~Contact form + handler + notifications all commented out~~ **FIXED** (97fdc12) - Web3Forms, validation, spam guards | - | Needs an access key pasted in before it delivers mail |
 | 5 | ~~`server-side.js` cannot run on static hosting~~ **FIXED** (97fdc12) - deleted, with all 4 runtime deps | - | - |
-| 6 | `styles.scss` (109 ln) stale vs `styles.css` (~1300 ln) | styles/ | Recompiling destroys the site. STILL OPEN - see UC-8 |
+| 6 | ~~`styles.scss` stale vs `styles.css`~~ **FIXED** (d12a7a8) - deleted with its source map; styles.css is the single source | - | - |
 | 7 | ~~No description, canonical, OG, favicon, robots, sitemap, JSON-LD~~ **FIXED** (2c779f9) | - | Not yet validated against live crawlers |
 | 8 | ~~`npm test` exits 1 by design~~ **FIXED** (d71b611) - 49 Playwright tests across 7 specs | - | - |
 | 9 | ~~Two `<script>` tags load fully-commented files~~ **FIXED** (2798137) | - | - |
-| 10 | Theme choice not persisted, ignores `prefers-color-scheme` | app.js | Resets every visit |
-| 11 | At 360px `div.header-content` is a 280px box holding 287px of content behind `overflow-x:hidden`, cutting off the hero heading. The page does NOT scroll sideways | styles.css | Hero unreadable on small phones; confirmed pre-existing at HEAD |
-| 12 | Light-mode accent `#0dbae1` on `#ffffff` measures **2.3:1**, below the 3:1 WCAG 1.4.3 minimum for large text | styles.css:26 | Confirmed by axe; hits the "Osman." span in the hero h1 |
+| 10 | ~~Theme not persisted, ignores `prefers-color-scheme`~~ **FIXED** (fe33978) - stored in localStorage, pre-paint script, OS fallback | - | - |
+| 11 | ~~At 360px content is clipped~~ **NOT A DEFECT** - the only thing overflowing was `.header-shapes`, decorative circles clipped by `overflow:hidden` on purpose. The heading wraps correctly and no text is cut. The original screenshot that suggested otherwise was captured before Poppins loaded, so fallback metrics made it look clipped. The test now measures clipped *text*, not decoration | - | Lesson: verify a layout finding with fonts loaded |
+| 12 | ~~Light-mode accent below AA~~ **FIXED** (441d3fe) - four contrast failures corrected; axe now reports 0 violating nodes across 4 panels x 2 themes | - | - |
 | 13 | `styles.scss` palette (`#27ae60`) diverges from live `styles.css` (`#457fe4`) | styles/ | Any colour sourced from the SCSS is off-brand |
 | 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css:43 | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
 | 15 | A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it | styles.css:~705, ~1130, ~1210 | Same abandoned-scaffold pattern as #portfolio; left in place as out of scope |
 | 16 | `tests/static-server.js` resolved its root from `__dirname/..`, so `cd`-ing elsewhere still served the repo root - it silently invalidated a before/after comparison | fixed (2798137) | Now honours `STATIC_ROOT`; always verify two servers serve different builds before trusting a diff |
 | 17 | **ACTION REQUIRED**: index.html carries `WEB3FORMS_ACCESS_KEY_HERE`. Until a real key from web3forms.com replaces it, the contact form validates but reports "not configured" instead of sending | index.html | The only thing standing between the form and working |
 | 18 | ~~Social links missing `rel="noopener noreferrer"`; no CSP; email and phone harvestable from raw HTML~~ **FIXED** (130a5d8) | - | CSP is meta-delivered, so `frame-ancestors` is inert; a real header host would close that |
+| 19 | An inline pre-paint script is required for the theme, but the CSP forbids `unsafe-inline`. Resolved with a sha256 hash in `script-src` (fe33978). Editing that script without regenerating the hash silently disables it | index.html | The CSP test catches the drift |

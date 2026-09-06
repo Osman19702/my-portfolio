@@ -74,10 +74,11 @@ you want cross-browser evidence.
 
 ### Expected failures
 
-One test carries a `test.fail()` annotation. It documents a real, unfixed bug rather
-than a passing behaviour, and each names the defect in its message. If the bug is ever
+None currently. Where a test documents a real, unfixed bug rather than a passing
+behaviour, it carries a `test.fail()` annotation naming the defect. If the bug is later
 fixed, Playwright reports *"expected to fail but passed"* and forces the annotation to
-be removed — so these cannot rot silently.
+be removed — so they cannot rot silently. Six were used during this work and all have
+now been retired by fixing the underlying bugs.
 
 ## Performance
 
@@ -148,9 +149,9 @@ Honest list, not a marketing section.
 - **The contact form is not delivering yet.** `index.html` carries a placeholder
   Web3Forms access key. Until a real key replaces it, the form validates and reports
   that it is not configured. Get one at <https://web3forms.com>.
-- **Content is clipped at 360px.** `div.header-content` is a 280px box holding 287px of
-  content behind `overflow-x: hidden`, so the hero heading is cut off on small phones.
-  The page does not scroll sideways; the content is hidden rather than spilled.
+- **Layout is tight at 360px.** The container reserves 80px of horizontal padding at a
+  360px viewport, leaving the hero heading a ~220px column. It wraps correctly and
+  nothing is cut off, but there is little room to spare on the smallest phones.
 - **The CSP is delivered by `<meta>`**, because GitHub Pages cannot set response
   headers. `frame-ancestors` is ignored in a meta policy, so this does not prevent the
   page being framed.

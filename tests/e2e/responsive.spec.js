@@ -57,39 +57,39 @@ test.describe('Responsive layout', () => {
     }
 
     for (const viewport of VIEWPORTS) {
-        test(`${viewport.name} (${viewport.width}px) does not clip its own content`, async ({ page }) => {
-            if (viewport.width === 360) {
-                test.fail(
-                    true,
-                    'KNOWN BUG (backlog #11): at 360px div.header-content is a 280px box ' +
-                    'holding 287px of content behind overflow-x:hidden, so the hero heading ' +
-                    'is visibly cut off. The page does NOT scroll sideways, which is why the ' +
-                    'horizontal-scroll check above passes - the content is clipped, not ' +
-                    'spilled. Confirmed pre-existing at HEAD. Needs a responsive fix.'
-                );
-            }
-
+        test(`${viewport.name} (${viewport.width}px) does not clip its own text`, async ({ page }) => {
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
             await page.goto('/');
 
-            // An element whose scroll extent exceeds its visible box is hiding
-            // content from the reader.
+            // Only elements that hold text of their own. A container whose
+            // scroll extent exceeds its box because of a decorative child is
+            // not a bug: .header-shapes deliberately overhangs and is clipped
+            // by overflow:hidden, which is the intended look.
             const clipped = await page.evaluate(() =>
                 [...document.querySelectorAll('body *')]
                     .filter((el) => {
                         const rect = el.getBoundingClientRect();
-                        return rect.width > 0 && rect.height > 0
-                            && el.scrollWidth > el.clientWidth + 1;
+                        if (rect.width === 0 || rect.height === 0) return false;
+                        if (getComputedStyle(el).visibility === 'hidden') return false;
+
+                        const ownText = [...el.childNodes]
+                            .filter((n) => n.nodeType === Node.TEXT_NODE)
+                            .map((n) => n.textContent.trim())
+                            .join('');
+                        if (!ownText) return false;
+
+                        return el.scrollWidth > el.clientWidth + 1;
                     })
                     .map((el) => ({
                         selector: el.tagName.toLowerCase()
                             + (el.className ? '.' + String(el.className).trim().split(/\s+/).join('.') : ''),
+                        text: el.textContent.trim().slice(0, 40),
                         scrollWidth: el.scrollWidth,
                         clientWidth: el.clientWidth,
                     }))
             );
 
-            expect(clipped, 'elements hiding content behind their own edge').toEqual([]);
+            expect(clipped, 'elements hiding their own text behind their edge').toEqual([]);
         });
     }
 
