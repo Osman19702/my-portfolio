@@ -142,7 +142,7 @@
     </script>
 </head>
 <body class="main-content">
-    <header class="container header active" id="home">
+    <header class="container header active" id="home" role="tabpanel" aria-labelledby="tab-home" tabindex="0">
         <div class="header-content">
             <div class="header-shapes">
                 <div class="shape shape-1"></div>
@@ -171,7 +171,7 @@
     </header>
 
     <main>
-        <section class="container about" id="about">
+        <section class="container about" id="about" role="tabpanel" aria-labelledby="tab-about" tabindex="0">
             <div class="main-title">
                 <h2>About <span>me</span><span class="bg-text">my stats</span></h2>
             </div>
@@ -503,7 +503,7 @@
         </section>
 
 
-        <section class="container" id="certifications">
+        <section class="container" id="certifications" role="tabpanel" aria-labelledby="tab-certifications" tabindex="0">
             <div class="main-title">
                 <h2>Licenses &amp; <span>Certifications</span><span class="bg-text">Credentials</span></h2>
             </div>
@@ -612,7 +612,7 @@
             </div>
         </section>
 
-        <section class="container contact" id="contact">
+        <section class="container contact" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0">
             <div class="contact-container">
                 <div class="main-title">
                     <h2>Contact <span>Me</span><span class="bg-text">Contact</span></h2>
@@ -716,24 +716,28 @@
         </section>
     </main>
 
-    <div class="controls">
-        <div class="control active-btn" data-id="home">
-            <i class="fas fa-home"></i>
-        </div>
-        <div class="control" data-id="about">
-            <i class="fas fa-user"></i>
-        </div>
-        <div class="control" data-id="certifications">
-            <i class="fas fa-certificate"></i>
-        </div>
-        <div class="control" data-id="contact">
-            <i class="fas fa-envelope-open"></i>
-        </div>
+    <div class="controls" role="tablist" aria-label="Sections" aria-orientation="vertical">
+        <button type="button" class="control active-btn" id="tab-home" data-id="home"
+                role="tab" aria-controls="home" aria-selected="true" aria-label="Home" tabindex="0">
+            <i class="fas fa-home" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="control" id="tab-about" data-id="about"
+                role="tab" aria-controls="about" aria-selected="false" aria-label="About me" tabindex="-1">
+            <i class="fas fa-user" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="control" id="tab-certifications" data-id="certifications"
+                role="tab" aria-controls="certifications" aria-selected="false" aria-label="Licenses and certifications" tabindex="-1">
+            <i class="fas fa-certificate" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="control" id="tab-contact" data-id="contact"
+                role="tab" aria-controls="contact" aria-selected="false" aria-label="Contact me" tabindex="-1">
+            <i class="fas fa-envelope-open" aria-hidden="true"></i>
+        </button>
     </div>
 
-    <div class="theme-btn">
-        <i class="fas fa-adjust"></i>
-    </div>
+    <button type="button" class="theme-btn" aria-label="Switch to light mode" aria-pressed="false">
+        <i class="fas fa-adjust" aria-hidden="true"></i>
+    </button>
 
     <script src="app.js"></script>
     <script src="form-submission.js"></script>

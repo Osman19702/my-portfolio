@@ -148,6 +148,35 @@ section {
   pointer-events: none;
 }
 
+/* The tab controls and the theme toggle are real <button>s so they are
+   keyboard operable. These resets keep them looking exactly as they did
+   when they were <div>s. */
+.controls .control,
+.theme-btn {
+  border: none;
+  font: inherit;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.controls .control:focus-visible,
+.theme-btn:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 3px;
+}
+
+/* Panels are focusable so keyboard users can scroll them, but they should
+   not show a focus ring when revealed by a click. */
+.container:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: -3px;
+}
+
+.container:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /*Header animations*/
 @keyframes fadeInUp {
   from {

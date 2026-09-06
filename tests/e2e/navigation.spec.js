@@ -81,15 +81,87 @@ test.describe('Navigation - the tab contract', () => {
     });
 
     test('navigation controls are reachable and operable by keyboard', async ({ page }) => {
-        test.fail(
-            true,
-            'KNOWN BUG (backlog #2): .control elements are <div>s with click handlers. ' +
-            'They are not focusable and do not respond to Enter/Space. Fixed by UC-3.'
-        );
-
         const control = page.locator('.control[data-id="about"]');
+
         await control.focus();
         await page.keyboard.press('Enter');
         await expect(page.locator('#about')).toHaveAttribute('class', ACTIVE);
+
+        await page.locator('.control[data-id="contact"]').focus();
+        await page.keyboard.press(' ');
+        await expect(page.locator('#contact')).toHaveAttribute('class', ACTIVE);
+    });
+
+    test('the controls are real buttons with accessible names', async ({ page }) => {
+        const controls = page.locator('.control');
+        const count = await controls.count();
+
+        for (let i = 0; i < count; i += 1) {
+            const control = controls.nth(i);
+            await expect(control).toHaveJSProperty('tagName', 'BUTTON');
+            await expect(control).toHaveAttribute('type', 'button');
+
+            const name = await control.getAttribute('aria-label');
+            expect(name, `control ${i} needs an accessible name`).toBeTruthy();
+        }
+    });
+
+    test('the tablist exposes the ARIA tab pattern', async ({ page }) => {
+        await expect(page.locator('.controls')).toHaveAttribute('role', 'tablist');
+
+        for (const id of SECTIONS) {
+            const tab = page.locator(`.control[data-id="${id}"]`);
+            await expect(tab).toHaveAttribute('role', 'tab');
+            await expect(tab).toHaveAttribute('aria-controls', id);
+            await expect(page.locator(`#${id}`)).toHaveAttribute('role', 'tabpanel');
+            await expect(page.locator(`#${id}`)).toHaveAttribute('aria-labelledby', `tab-${id}`);
+        }
+    });
+
+    test('aria-selected and the roving tabindex follow the selection', async ({ page }) => {
+        await page.locator('.control[data-id="certifications"]').click();
+
+        const selected = await page.locator('.control').evaluateAll((nodes) =>
+            nodes.map((n) => ({
+                id: n.dataset.id,
+                selected: n.getAttribute('aria-selected'),
+                tabindex: n.getAttribute('tabindex'),
+            }))
+        );
+
+        // Exactly one tab is selected, and only that tab is in the tab order.
+        expect(selected.filter((t) => t.selected === 'true')).toHaveLength(1);
+        expect(selected.find((t) => t.id === 'certifications').selected).toBe('true');
+        expect(selected.find((t) => t.id === 'certifications').tabindex).toBe('0');
+        expect(selected.filter((t) => t.tabindex === '-1')).toHaveLength(SECTIONS.length - 1);
+    });
+
+    test('arrow keys move between tabs and wrap around', async ({ page }) => {
+        await page.locator('.control[data-id="home"]').focus();
+
+        await page.keyboard.press('ArrowDown');
+        await expect(page.locator('#about')).toHaveAttribute('class', ACTIVE);
+
+        await page.keyboard.press('ArrowUp');
+        await expect(page.locator('#home')).toHaveAttribute('class', ACTIVE);
+
+        // Up from the first tab wraps to the last.
+        await page.keyboard.press('ArrowUp');
+        await expect(page.locator('#contact')).toHaveAttribute('class', ACTIVE);
+
+        await page.keyboard.press('Home');
+        await expect(page.locator('#home')).toHaveAttribute('class', ACTIVE);
+
+        await page.keyboard.press('End');
+        await expect(page.locator('#contact')).toHaveAttribute('class', ACTIVE);
+    });
+
+    test('the whole tablist occupies a single tab stop', async ({ page }) => {
+        // A roving tabindex means Tab enters the tablist once, not four times.
+        const inTabOrder = await page.locator('.control').evaluateAll(
+            (nodes) => nodes.filter((n) => n.tabIndex === 0).length
+        );
+
+        expect(inTabOrder).toBe(1);
     });
 });

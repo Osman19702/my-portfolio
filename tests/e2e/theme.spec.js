@@ -42,6 +42,31 @@ test.describe('Theme toggle', () => {
             .not.toBe(dark);
     });
 
+    test('the toggle is a real button that reports its state', async ({ page }) => {
+        const toggle = page.locator('.theme-btn');
+
+        await expect(toggle).toHaveJSProperty('tagName', 'BUTTON');
+        await expect(toggle).toHaveAttribute('type', 'button');
+        await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+        await expect(toggle).toHaveAttribute('aria-label', /light mode/i);
+
+        await toggle.click();
+
+        await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+        await expect(toggle).toHaveAttribute('aria-label', /dark mode/i);
+    });
+
+    test('the toggle responds to the keyboard', async ({ page }) => {
+        const toggle = page.locator('.theme-btn');
+
+        await toggle.focus();
+        await page.keyboard.press('Enter');
+        await expect(page.locator('body')).toHaveClass(/light-mode/);
+
+        await page.keyboard.press(' ');
+        await expect(page.locator('body')).not.toHaveClass(/light-mode/);
+    });
+
     test('the chosen theme survives a reload', async ({ page }) => {
         test.fail(
             true,
