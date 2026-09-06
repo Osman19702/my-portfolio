@@ -22,19 +22,24 @@ A broken or untested portfolio contradicts the CV it is advertising.
 
 GROUND TRUTH — read these before proposing anything
 - Static site, no framework, no build step. Served straight from the repo root.
-  index.html (~623 lines)  — entire page, single file, all sections inline
-  styles/styles.css (~1300 lines) — the LIVE stylesheet, linked by index.html
+  index.html (~745 lines)  — entire page, single file, all sections inline
+  styles/styles.css (~1238 lines) — the LIVE stylesheet, linked by index.html
   styles/styles.scss (~109 lines) + styles.css.map — STALE. See TRAPS.
-  app.js — 12-line IIFE: tab switching + light-mode toggle
+  app.js (~65 lines) — tab switching (ARIA tabs + roving tabindex) and theme toggle
   form-submission.js, notification.js — 100% commented out, still <script>-included
   server-side.js — Express + nodemailer + cors; CANNOT run on the current host
   cv/OsmanTuraliogluCV.pdf — linked as ./cv/OsmanTuraliogluCV.pdf?v=YYYY-MM-DD
-  img/img1.jpg (1.7 MB) — committed but referenced by nothing
+  img/og-image.png — the 1200x630 social card
+  tests/ + playwright.config.js — 49 Playwright tests across 7 specs (devDeps only)
+  .github/workflows/ci.yml — runs the suite on push and PR to master
   CNAME -> www.osmanturalioglu.com ; deploys from branch `master`
+- Run the site locally with `npm run serve` (zero-dependency static server).
+  `npm start` runs the dead Express file and needs deps that are not installed.
 - Navigation is NOT scroll-based. It is a tab/SPA pattern:
   `.container { display: none }` + `.active { display: block }`.
-  app.js reads `data-id` off `.control` elements and toggles `.active` on `#<data-id>`.
-  Section ids: #home #about #portfolio #certifications #contact
+  app.js reads `data-id` off `.control` buttons and toggles `.active` on `#<data-id>`.
+  Section ids: #home #about #certifications #contact (four; #portfolio was removed).
+  The controls are <button role="tab"> with a roving tabindex - preserve that.
 - External deps: Font Awesome 5.15.4 (cdnjs, with SRI), Google Fonts Poppins.
 
 HARD CONSTRAINTS — violating any of these is a failed task
@@ -357,17 +362,18 @@ Found by reading the repo; each is real and reproducible today.
 
 | # | Defect | Location | Impact |
 |---|--------|----------|--------|
-| 1 | `#portfolio` section is wrapped in an HTML comment and never reaches the DOM; the block holds an empty `<div class="portfolios">` | index.html:505-516 | Placeholder never filled in - a content gap, not a nav bug |
-| 2 | Nav controls and theme toggle are `<div>`s with click handlers | index.html:601-618, app.js | Zero keyboard access, no accessible name |
-| 3 | `img/img1.jpg` (1.7 MB) referenced nowhere | img/ | Dead weight in repo |
+| 1 | ~~`#portfolio` was commented-out placeholder markup~~ **FIXED** (2f49bc0) - block and its CSS removed. A real project showcase still needs writing | - | Open as a content task, not a defect |
+| 2 | ~~Nav controls and theme toggle are `<div>`s~~ **FIXED** (97d11a6) - now `<button>` with the ARIA tabs pattern and roving tabindex | - | - |
+| 3 | ~~`img/img1.jpg` (1.6 MB) referenced nowhere~~ **FIXED** (3593e08) - deleted | - | - |
 | 4 | Contact form + handler + notifications all commented out | index.html, form-submission.js, notification.js | No working contact path |
 | 5 | `server-side.js` cannot run on static hosting | server-side.js | Misleading dead code |
 | 6 | `styles.scss` (109 ln) stale vs `styles.css` (1300 ln) | styles/ | Recompiling destroys the site |
-| 7 | No description, canonical, OG, favicon, robots, sitemap, JSON-LD | index.html | Invisible to search and social |
-| 8 | `npm test` exits 1 by design | package.json | No tests in a QA portfolio |
+| 7 | ~~No description, canonical, OG, favicon, robots, sitemap, JSON-LD~~ **FIXED** (2c779f9) | - | Not yet validated against live crawlers |
+| 8 | ~~`npm test` exits 1 by design~~ **FIXED** (d71b611) - 49 Playwright tests across 7 specs | - | - |
 | 9 | Two `<script>` tags load fully-commented files | index.html:621-622 | Wasted requests |
 | 10 | Theme choice not persisted, ignores `prefers-color-scheme` | app.js | Resets every visit |
 | 11 | At 360px `div.header-content` is a 280px box holding 287px of content behind `overflow-x:hidden`, cutting off the hero heading. The page does NOT scroll sideways | styles.css | Hero unreadable on small phones; confirmed pre-existing at HEAD |
 | 12 | Light-mode accent `#0dbae1` on `#ffffff` measures **2.3:1**, below the 3:1 WCAG 1.4.3 minimum for large text | styles.css:26 | Confirmed by axe; hits the "Osman." span in the hero h1 |
 | 13 | `styles.scss` palette (`#27ae60`) diverges from live `styles.css` (`#457fe4`) | styles/ | Any colour sourced from the SCSS is off-brand |
 | 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css:43 | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
+| 15 | A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it | styles.css:~705, ~1130, ~1210 | Same abandoned-scaffold pattern as #portfolio; left in place as out of scope |
