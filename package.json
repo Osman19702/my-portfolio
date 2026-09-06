@@ -16,16 +16,19 @@
     "type": "git",
     "url": "git+https://github.com/Osman19702/my-portfolio.git"
   },
-  "author": "",
+  "author": "Osman Turalioglu",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Osman19702/my-portfolio/issues"
   },
-  "homepage": "https://github.com/Osman19702/my-portfolio#readme",
+  "homepage": "https://www.osmanturalioglu.com",
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@playwright/test": "^1.63.0",
     "lighthouse": "^13.4.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
