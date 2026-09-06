@@ -27,8 +27,9 @@ GROUND TRUTH — read these before proposing anything
   styles/styles.css (~1264 lines) — the LIVE stylesheet, linked by index.html
   styles/styles.scss (~109 lines) + styles.css.map — STALE. See TRAPS.
   app.js (~65 lines) — tab switching (ARIA tabs + roving tabindex) and theme toggle
-  form-submission.js, notification.js — 100% commented out, still <script>-included
-  server-side.js — Express + nodemailer + cors; CANNOT run on the current host
+  form-submission.js — contact form validation, spam guards, Web3Forms POST
+  notification.js — toast notifications (live region)
+  (server-side.js was deleted; it could never run on static hosting)
   cv/OsmanTuraliogluCV.pdf — linked as ./cv/OsmanTuraliogluCV.pdf?v=YYYY-MM-DD
   img/og-image.png — the 1200x630 social card
   tests/ + playwright.config.js — 49 Playwright tests across 7 specs (devDeps only)
@@ -74,10 +75,12 @@ TRAPS — real hazards discovered in this repo
   --color-secondary: #27ae60 (green). The LIVE styles.css declares #457fe4 (blue) in :root
   and #0dbae1 (cyan) under .light-mode. Any colour you take from the SCSS will be off-brand.
   Read colour values from styles/styles.css only, and confirm against a rendered screenshot.
-- server-side.js is dead code in production. GitHub Pages serves static files only — there is
-  no Node runtime. Any contact-form work must be client-side or use a third-party endpoint.
-- The contact form, its handler and its notification UI are all commented out simultaneously.
-  Re-enabling one without the others produces a form that silently does nothing.
+- There is NO server. GitHub Pages serves static files only. The contact form posts to
+  Web3Forms; index.html holds a public access key. The site has ZERO runtime dependencies
+  and must stay that way.
+- axe only scans VISIBLE content, and four of the five panels are display:none at any moment.
+  A panel must be revealed before it is audited - scanning only the default view silently
+  skipped the entire contact form until UC-5.
 - Light mode is a body class only. It does not persist and does not read prefers-color-scheme.
 
 WORKING METHOD
@@ -373,8 +376,8 @@ Found by reading the repo; each is real and reproducible today.
 | 1 | ~~`#portfolio` was commented-out placeholder markup~~ **FIXED** (2f49bc0) - block and its CSS removed. A real project showcase still needs writing | - | Open as a content task, not a defect |
 | 2 | ~~Nav controls and theme toggle are `<div>`s~~ **FIXED** (97d11a6) - now `<button>` with the ARIA tabs pattern and roving tabindex | - | - |
 | 3 | ~~`img/img1.jpg` (1.6 MB) referenced nowhere~~ **FIXED** (3593e08) - deleted | - | - |
-| 4 | Contact form + handler + notifications all commented out | index.html, form-submission.js, notification.js | No working contact path |
-| 5 | `server-side.js` cannot run on static hosting | server-side.js | Misleading dead code |
+| 4 | ~~Contact form + handler + notifications all commented out~~ **FIXED** (97fdc12) - Web3Forms, validation, spam guards | - | Needs an access key pasted in before it delivers mail |
+| 5 | ~~`server-side.js` cannot run on static hosting~~ **FIXED** (97fdc12) - deleted, with all 4 runtime deps | - | - |
 | 6 | `styles.scss` (109 ln) stale vs `styles.css` (1300 ln) | styles/ | Recompiling destroys the site |
 | 7 | ~~No description, canonical, OG, favicon, robots, sitemap, JSON-LD~~ **FIXED** (2c779f9) | - | Not yet validated against live crawlers |
 | 8 | ~~`npm test` exits 1 by design~~ **FIXED** (d71b611) - 49 Playwright tests across 7 specs | - | - |
@@ -386,3 +389,4 @@ Found by reading the repo; each is real and reproducible today.
 | 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css:43 | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
 | 15 | A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it | styles.css:~705, ~1130, ~1210 | Same abandoned-scaffold pattern as #portfolio; left in place as out of scope |
 | 16 | `tests/static-server.js` resolved its root from `__dirname/..`, so `cd`-ing elsewhere still served the repo root - it silently invalidated a before/after comparison | fixed (2798137) | Now honours `STATIC_ROOT`; always verify two servers serve different builds before trusting a diff |
+| 17 | **ACTION REQUIRED**: index.html carries `WEB3FORMS_ACCESS_KEY_HERE`. Until a real key from web3forms.com replaces it, the contact form validates but reports "not configured" instead of sending | index.html | The only thing standing between the form and working |
