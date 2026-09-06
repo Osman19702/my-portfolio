@@ -20,9 +20,20 @@
           being framed. X-Frame-Options cannot be set by meta either.
         - the policy only applies once the parser reaches this tag, so it
           cannot cover anything earlier in the document.
+
+      DELIBERATELY ABSENT: upgrade-insecure-requests. It took the site down.
+      GitHub has not issued a certificate for this custom domain, so the page
+      is served over http; that directive then rewrote every same-origin
+      subresource to https, where the *.github.io certificate does not match
+      the domain. Stylesheet and all three scripts failed to load and visitors
+      got raw unstyled HTML. It is also redundant: once Pages issues the
+      certificate and "Enforce HTTPS" is on, GitHub redirects http to https
+      and every URL here is relative or already absolute-https. Do not re-add
+      it. Note that it could never fail locally - the directive exempts
+      localhost, which is exactly why 85 green tests said nothing.
       Both would be fixed by moving to a host that sets response headers.
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com">
 
     <!--
       Applied before first paint so a returning visitor never sees a flash of

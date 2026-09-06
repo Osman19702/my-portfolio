@@ -126,6 +126,29 @@ test.describe('Privacy hardening', () => {
         expect(policy).toContain('connect-src https://api.web3forms.com');
     });
 
+    // Regression guard for a production-only outage. The custom domain has no
+    // certificate of its own, so the site is served over http. With
+    // upgrade-insecure-requests in the policy, every same-origin subresource
+    // was rewritten to https, hit the *.github.io certificate, and failed -
+    // visitors got raw unstyled HTML with no scripts.
+    //
+    // This suite could not have caught it: the directive exempts localhost by
+    // specification, so all 85 tests passed against a site that was down.
+    // Asserting its absence is the only thing this environment CAN check.
+    test('the CSP does not upgrade subresources to a scheme the domain cannot serve', async ({ page }) => {
+        await page.goto('/');
+
+        const policy = await page
+            .locator('meta[http-equiv="Content-Security-Policy"]')
+            .getAttribute('content');
+
+        expect(
+            policy,
+            'upgrade-insecure-requests breaks the site whenever it is served over http, '
+            + 'and is redundant once Pages enforces HTTPS'
+        ).not.toContain('upgrade-insecure-requests');
+    });
+
     test('the CSP does not block anything the page needs', async ({ page }) => {
         const violations = [];
         page.on('console', (m) => {
