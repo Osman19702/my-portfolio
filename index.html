@@ -702,7 +702,7 @@
                 <article class="project-card">
                     <figure class="project-media">
                         <img src="./img/promptfixer.png" width="1200" height="750" loading="lazy" decoding="async"
-                             alt="PromptFixer window. Left: a sample prompt scored 61 out of 100 with 10 issues. Right: the local model's rewrite scored 91, with a summary of what changed and per-category bars for clarity, specificity, context, format and structure.">
+                             alt="PromptFixer window. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues. Right: the local model's rewrite scored 93, up 51, with a summary of what changed, per-category bars for clarity, specificity, context, format and structure, and the rewritten prompt, which names the audience, asks for bullet points and caps the length at 200 words.">
                     </figure>
                     <div class="project-body">
                         <div class="project-info">
@@ -715,6 +715,9 @@
                             </div>
                             <p class="project-desc">
                                 Lint, score and rewrite LLM prompts. A Windows desktop app with a built-in local model; cloud providers optional.
+                            </p>
+                            <p class="project-desc">
+                                I built it with Claude Code, for personal use: fixing a prompt before I send it means fewer wasted tokens and a better first answer.
                             </p>
                             <ul class="project-points">
                                 <li>Scores a prompt instantly against ~30 prompt-engineering rules.</li>

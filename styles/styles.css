@@ -757,6 +757,10 @@ section {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
   gap: 1.4rem;
   padding: 2.2rem 0 3rem;
+  /* Never wider than the screenshot's own pixels, so it is never upscaled
+     and never blurry at 100% zoom on a wide screen. */
+  max-width: 1200px;
+  margin: 0 auto;
 }
 /* The card surface stays the page colour on purpose: the grey and accent text
    tokens were tuned for AA against --color-primary, and on a grey-5 surface the
@@ -777,13 +781,13 @@ section {
   margin: 0;
   border-bottom: 1px solid var(--color-grey-5);
 }
+/* The whole screenshot, always. A max-height with object-fit: cover used to
+   crop it from the bottom, and the crop grew with the card, so at 100% zoom on
+   a wide screen the rewritten prompt was cut off and only came back at 150%. */
 .project-media img {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 420px;
-  object-fit: cover;
-  object-position: top;
 }
 /* Two columns when two 320px columns fit inside the card, one otherwise. The
    card's own width decides, so no breakpoint has to know about it. */
