@@ -71,7 +71,7 @@ test.describe('Accessibility (axe-core)', () => {
     // Hidden panels are skipped by axe, so each one has to be revealed and
     // scanned in its own right. Without this the contact form - the only
     // interactive content on the site - would never be audited at all.
-    for (const panel of ['about', 'certifications', 'contact']) {
+    for (const panel of ['about', 'certifications', 'projects', 'contact']) {
         test(`the ${panel} panel has no critical or serious violations`, async ({ page }) => {
             await page.goto('/');
             await settled(page, 'dark');
@@ -120,6 +120,7 @@ test.describe('Document structure (WCAG 1.3.1, 2.4.1)', () => {
         for (const [panel, expected] of [
             ['about', 'About me'],
             ['certifications', 'Licenses & Certifications'],
+            ['projects', 'My Projects'],
             ['contact', 'Contact Me'],
         ]) {
             await page.locator(`.control[data-id="${panel}"]`).click();

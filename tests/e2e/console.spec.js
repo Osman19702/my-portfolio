@@ -47,7 +47,7 @@ test.describe('Runtime health', () => {
         });
 
         await page.goto('/');
-        for (const target of ['about', 'certifications', 'contact', 'home']) {
+        for (const target of ['about', 'certifications', 'projects', 'contact', 'home']) {
             await page.locator(`.control[data-id="${target}"]`).click();
         }
 
