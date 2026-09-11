@@ -17,7 +17,7 @@ small scripts, **no framework and no build step**. The files in the repo root ar
 files the browser gets.
 
 It is also a work sample. The owner is a QA engineer, so the repo carries a real test
-suite — **86 Playwright tests across 8 spec files**, including accessibility scans of
+suite — **103 Playwright tests across 9 spec files**, including accessibility scans of
 every panel in both themes, and they run in CI on every push and pull request.
 
 ## Stack
@@ -76,6 +76,7 @@ live send was verified once, by hand, with a real browser UA.
 | `responsive.spec.js` | 360 / 768 / 1440 — horizontal scroll and content clipping |
 | `seo.spec.js` | Metadata, Open Graph, JSON-LD, robots, sitemap, favicons |
 | `console.spec.js` | No console errors, no failed requests |
+| `projects.spec.js` | The Projects panel: versioned release-asset URL and new-tab safety, version / file / hash copies pinned to each other, the unsigned-installer note, 360px fit, axe in both themes |
 
 ### Expected failures
 
@@ -112,6 +113,7 @@ app.js                      tab navigation, theme toggle, contact-detail assembl
 form-submission.js          contact form validation and submission
 notification.js             toast notifications (an ARIA live region)
 styles/styles.css           the ONLY stylesheet — see the note below
+img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run)
 scripts/build-icon-sprite.js  regenerates the sprite from Font Awesome
 tests/e2e/                  Playwright specs
 tests/static-server.js      zero-dependency static server for local and CI runs
@@ -131,12 +133,14 @@ preprocessor without also removing this note.
 
 ### Editing icons
 
-Icons come from an inline sprite, not a webfont or a CDN. After adding or removing an
-`<svg class="svg-icon">` in `index.html`:
-
-```bash
-npm run build:icons
-```
+Icons come from an inline sprite in `index.html`, not a webfont or a CDN. The sprite was
+generated once by `scripts/build-icon-sprite.js` from the original `<i class="fas …">`
+tags. Those tags no longer exist, so the generator now exits with "No Font Awesome `<i>`
+tags found" and **must not be run**: it strips the existing sprite before it looks for
+anything. To add an icon, copy the `viewBox` and `<path>` from
+`node_modules/@fortawesome/fontawesome-free/svgs/<style>/<name>.svg` into a new
+`<symbol id="i-<name>">` by hand (see `i-windows`), then reference it with
+`<use href="#i-<name>">`.
 
 Font Awesome Free icons are used under **CC BY 4.0**; the attribution is in the sprite.
 

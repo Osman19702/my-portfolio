@@ -52,7 +52,8 @@ test.describe('Responsive layout', () => {
             await page.goto('/');
 
             await expect(page.locator('h1.name')).toBeVisible();
-            await expect(page.locator('a.main-btn')).toBeVisible();
+            // Scoped to the hero: the Projects panel has its own .main-btn download link.
+            await expect(page.locator('#home a.main-btn')).toBeVisible();
         });
     }
 

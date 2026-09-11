@@ -6,10 +6,9 @@ const { test, expect } = require('@playwright/test');
  * `data-id` onto the section id it reveals. These tests pin that contract.
  */
 
-// The sections that actually render. A fifth, #portfolio, exists in
-// index.html but is wrapped in an HTML comment (around line 505) and never
-// reaches the DOM, so it is deliberately absent from this list.
-const SECTIONS = ['home', 'about', 'certifications', 'contact'];
+// Every section that renders, in DOM order. The tablist must expose exactly
+// these, so adding a panel means adding it here too.
+const SECTIONS = ['home', 'about', 'certifications', 'projects', 'contact'];
 
 // `active-btn` also contains the substring "active", and a hyphen counts as a
 // word boundary, so a naive /\bactive\b/ matches both. Match the whole token.
@@ -157,7 +156,7 @@ test.describe('Navigation - the tab contract', () => {
     });
 
     test('the whole tablist occupies a single tab stop', async ({ page }) => {
-        // A roving tabindex means Tab enters the tablist once, not four times.
+        // A roving tabindex means Tab enters the tablist once, not five times.
         const inTabOrder = await page.locator('.control').evaluateAll(
             (nodes) => nodes.filter((n) => n.tabIndex === 0).length
         );

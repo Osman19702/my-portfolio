@@ -743,57 +743,222 @@ section {
   line-height: 1.55;
 }
 
-/* .blogs {
+/*Projects*/
+.projects-intro {
+  max-width: 720px;
+  margin: 1.4rem auto 0;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--color-grey-2);
+}
+.projects-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 2rem;
-  margin-top: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  gap: 1.4rem;
+  padding: 2.2rem 0 3rem;
 }
-.blogs .blog {
-  position: relative;
-  background-color: var(--color-grey-5);
-  border-radius: 5px;
-  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease-in-out;
+/* The card surface stays the page colour on purpose: the grey and accent text
+   tokens were tuned for AA against --color-primary, and on a grey-5 surface the
+   light-mode greys drop below 4.5:1. Border and shadow give the card its shape
+   in both themes. */
+.project-card {
+  border: 1px solid var(--color-grey-5);
+  border-radius: 14px;
+  box-shadow: var(--box-shadow-1);
+  overflow: hidden;
+  transition: border-color 0.25s;
 }
-.blogs .blog:hover {
-  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.3);
-  transform: translateY(-5px);
-  transition: all 0.4s ease-in-out;
+.project-card:hover,
+.project-card:focus-within {
+  border-color: var(--color-secondary);
 }
-.blogs .blog:hover img {
-  filter: grayscale(0);
-  transform: scale(1.1);
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.8);
+.project-media {
+  margin: 0;
+  border-bottom: 1px solid var(--color-grey-5);
 }
-.blogs .blog img {
+.project-media img {
+  display: block;
   width: 100%;
-  height: 300px;
+  height: auto;
+  max-height: 420px;
   object-fit: cover;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  filter: grayscale(100%);
-  transition: all 0.4s ease-in-out;
+  object-position: top;
 }
-.blogs .blog .blog-text {
-  margin-top: -7px;
-  padding: 1.1rem;
-  border-top: 8px solid var(--color-secondary);
+/* Two columns when two 320px columns fit inside the card, one otherwise. The
+   card's own width decides, so no breakpoint has to know about it. */
+.project-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1.6rem 2.4rem;
+  padding: 1.5rem 1.4rem;
 }
-.blogs .blog .blog-text h4 {
-  font-size: 1.5rem;
-  margin-bottom: 0.7rem;
-  transition: all 0.4s ease-in-out;
-  cursor: pointer;
+.project-info,
+.project-download {
+  min-width: 0;
 }
-.blogs .blog .blog-text h4:hover {
+.project-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+.project-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(69, 127, 228, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-secondary);
+  font-size: 1.1rem;
+}
+.project-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  color: var(--color-white);
+}
+.project-tagline {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   color: var(--color-secondary);
 }
-.blogs .blog .blog-text p {
+.project-desc {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--color-grey-1);
+  margin-bottom: 0.8rem;
+}
+.project-points li {
+  position: relative;
+  padding-left: 1.1rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
   color: var(--color-grey-2);
-  line-height: 2rem;
-  padding-bottom: 1rem;
-} */
+}
+.project-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-secondary);
+}
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0;
+}
+.project-stack span {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--color-grey-3);
+  color: var(--color-grey-2);
+}
+.project-download h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-grey-2);
+  margin-bottom: 0.8rem;
+}
+.project-download .btn-con {
+  margin-bottom: 1rem;
+}
+.project-meta {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-grey-2);
+}
+.project-meta .svg-icon {
+  margin-right: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-secondary);
+}
+.project-hash {
+  margin-top: 1rem;
+}
+.project-hash-label,
+.project-verify-label {
+  display: block;
+  margin: 0.8rem 0 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-grey-2);
+}
+.project-hash .project-hash-label {
+  margin-top: 0;
+}
+/* Both blocks must wrap: a 64-character digest has no break opportunity and
+   would otherwise push the page sideways at 360px. Text is --color-white on
+   grey-5 (7.98:1 light, 13.6:1 dark). */
+.project-hash code,
+.project-verify {
+  display: block;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: var(--color-grey-5);
+  color: var(--color-white);
+  font-family: Consolas, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  user-select: all;
+}
+.project-note {
+  max-width: none;
+  margin: 1.1rem 0 0;
+  font-style: normal;
+}
+.project-note strong {
+  color: var(--color-white);
+  font-weight: 600;
+}
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+}
+.project-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-secondary);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.project-links a:hover {
+  color: var(--color-white);
+}
+.project-links a:focus-visible,
+.project-btn:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 3px;
+}
 
 .contact-content-con {
   display: flex;
@@ -1050,7 +1215,7 @@ section {
     background-color: var(--color-grey-5);
   }
   .controls .control {
-    margin: 1rem 0.3rem;
+    margin: 1rem 0.25rem; /* five 55px tabs at 0.3rem overflow a 320px phone by 3px */
   }
 
   .about-container {
@@ -1093,9 +1258,14 @@ section {
     grid-template-columns: 1fr;
   }
 
-  .blogs {
-    grid-template-columns: repeat(1, 1fr);
-    padding-bottom: 6rem;
+  .projects-grid {
+    padding-bottom: 6rem; /* clear the fixed bottom tab bar, as .right-contact does */
+  }
+  .project-body {
+    padding: 1.2rem 1rem;
+  }
+  .project-btn .btn-text {
+    padding: 0 1.4rem;
   }
 
   .contact-content-con {
@@ -1175,20 +1345,9 @@ section {
   }
 }
 @media screen and (max-width: 1250px) {
-  .blogs {
-    grid-template-columns: repeat(2, 1fr);
-    margin-top: 6rem;
-  }
-
   .header-content .right-header {
     padding-right: 9rem;
   }
-}
-@media screen and (max-width: 660px) {
-  .blogs {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
 }
 @media screen and (max-width: 1070px) {
   .about-container {
