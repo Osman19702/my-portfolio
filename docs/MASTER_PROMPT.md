@@ -41,7 +41,8 @@ GROUND TRUTH — read these before proposing anything
 - Navigation is NOT scroll-based. It is a tab/SPA pattern:
   `.container { display: none }` + `.active { display: block }`.
   app.js reads `data-id` off `.control` buttons and toggles `.active` on `#<data-id>`.
-  Section ids: #home #about #certifications #contact (four; #portfolio was removed).
+  Section ids: #home #about #certifications #projects #contact (five; #portfolio was
+  removed, #projects added with the PromptFixer card).
   The controls are <button role="tab"> with a roving tabindex - preserve that.
 - External deps: Google Fonts Poppins ONLY. Font Awesome was removed in favour of
   an inline SVG sprite; do not reintroduce the CDN stylesheet.
@@ -379,7 +380,7 @@ Found by reading the repo; each is real and reproducible today.
 
 | # | Defect | Location | Impact |
 |---|--------|----------|--------|
-| 1 | ~~`#portfolio` was commented-out placeholder markup~~ **FIXED** (2f49bc0) - block and its CSS removed. A real project showcase still needs writing | - | Open as a content task, not a defect |
+| 1 | ~~`#portfolio` was commented-out placeholder markup~~ **FIXED** (2f49bc0) - block and its CSS removed. ~~A real project showcase still needs writing~~ **DONE** (feat/projects-section) - `#projects` panel with the PromptFixer card and a checksummed download block, covered by `projects.spec.js` | - | - |
 | 2 | ~~Nav controls and theme toggle are `<div>`s~~ **FIXED** (97d11a6) - now `<button>` with the ARIA tabs pattern and roving tabindex | - | - |
 | 3 | ~~`img/img1.jpg` (1.6 MB) referenced nowhere~~ **FIXED** (3593e08) - deleted | - | - |
 | 4 | ~~Contact form + handler + notifications all commented out~~ **FIXED** (97fdc12) - Web3Forms, validation, spam guards | - | Needs an access key pasted in before it delivers mail |
@@ -393,7 +394,7 @@ Found by reading the repo; each is real and reproducible today.
 | 12 | ~~Light-mode accent below AA~~ **FIXED** (441d3fe) - four contrast failures corrected; axe now reports 0 violating nodes across 4 panels x 2 themes | - | - |
 | 13 | `styles.scss` palette (`#27ae60`) diverges from live `styles.css` (`#457fe4`) | styles/ | Any colour sourced from the SCSS is off-brand |
 | 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css:43 | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
-| 15 | A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it | styles.css:~705, ~1130, ~1210 | Same abandoned-scaffold pattern as #portfolio; left in place as out of scope |
+| 15 | ~~A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it~~ **FIXED** (feat/projects-section) - the block was replaced by the Projects panel styles and the orphaned media-query rules were removed | - | - |
 | 16 | `tests/static-server.js` resolved its root from `__dirname/..`, so `cd`-ing elsewhere still served the repo root - it silently invalidated a before/after comparison | fixed (2798137) | Now honours `STATIC_ROOT`; always verify two servers serve different builds before trusting a diff |
 | 17 | ~~index.html carries `WEB3FORMS_ACCESS_KEY_HERE`~~ **FIXED** - real key wired in and verified end-to-end against the live API (HTTP 200, `success:true`, success toast, form cleared) | - | The guard remains and is now driven by tests that set the placeholder explicitly |
 | 18 | ~~Social links missing `rel="noopener noreferrer"`; no CSP; email and phone harvestable from raw HTML~~ **FIXED** (130a5d8) | - | CSP is meta-delivered, so `frame-ancestors` is inert; a real header host would close that |
