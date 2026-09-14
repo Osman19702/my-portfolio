@@ -1314,9 +1314,6 @@ section {
   .main-title h2 span {
     font-size: 2.3rem;
   }
-  .main-title h2 .bg-text {
-    font-size: 2.3rem;
-  }
 }
 @media screen and (max-width: 1432px) {
   .container {
@@ -1427,7 +1424,15 @@ section {
   .main-title h2 .bg-text {
     font-size: 4rem;
   }
-  
+}
+
+/* The watermark behind a section title ("Credentials", "Showcase") is wider
+   than a 360px phone at 4rem and pushed the page sideways. This used to sit
+   in the 600px block above, where the later 700px rule silently overrode it. */
+@media screen and (max-width: 600px) {
+  .main-title h2 .bg-text {
+    font-size: 2.3rem;
+  }
 }
 
 /* Five decorative shapes loop forever, and every panel and heading animates

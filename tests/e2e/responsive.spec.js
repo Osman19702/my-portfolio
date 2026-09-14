@@ -29,6 +29,22 @@ async function overflowingElements(page) {
 }
 
 test.describe('Responsive layout', () => {
+    // The other four panels are only in the layout after their tab is clicked,
+    // and each has a decorative watermark behind its title set in a large
+    // font; those are measured here, on the narrowest viewport, with the web
+    // font loaded (the fallback font is narrower and used to hide the overflow).
+    test('mobile (360px): every panel stays inside the viewport once opened', async ({ page }) => {
+        await page.setViewportSize({ width: 360, height: 800 });
+        await page.goto('/');
+        await page.evaluate(() => document.fonts.ready);
+        for (const id of ['about', 'certifications', 'projects', 'contact']) {
+            await page.locator(`.control[data-id="${id}"]`).click();
+            await expect(page.locator(`#${id}`)).toHaveClass(/(?:^|\s)active(?:\s|$)/);
+            const offenders = await overflowingElements(page);
+            expect(offenders, `${id} panel overflows the viewport`).toEqual([]);
+        }
+    });
+
     for (const viewport of VIEWPORTS) {
         test(`${viewport.name} (${viewport.width}px) does not scroll horizontally`, async ({ page }) => {
             // Arrange
