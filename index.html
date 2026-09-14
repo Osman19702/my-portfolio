@@ -8,8 +8,7 @@
 
     <!--
       Content-Security-Policy. Origins allowed, and why:
-        fonts.googleapis.com  the Poppins stylesheet
-        fonts.gstatic.com     the font files that stylesheet references
+        (fonts are self-hosted under ./fonts; no font origin is contacted)
         api.web3forms.com     the contact form POST
       No 'unsafe-inline' is needed anywhere: the page has no inline script,
       no inline style attribute and no inline event handler.
@@ -33,7 +32,7 @@
       localhost, which is exactly why 85 green tests said nothing.
       Both would be fixed by moving to a host that sets response headers.
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self'; font-src 'self'; connect-src https://api.web3forms.com">
 
     <!--
       Applied before first paint so a returning visitor never sees a flash of
@@ -80,9 +79,13 @@
     <meta name="twitter:image:alt" content="Osman Turalioglu, Senior QA Engineer. ISTQB CT-AI and CTAL-TAE certified.">
 
     <link rel="stylesheet" href="styles/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Poppins is self-hosted (fonts/, OFL). The two weights the first screen
+         uses (400 body, 600 headings and buttons) are preloaded so the hero
+         paints in the right face; the other weights load on demand from the
+         @font-face rules in styles.css. Measured: only these two load on the
+         home tab, so a third preload would be a wasted request. -->
+    <link rel="preload" href="./fonts/poppins-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/poppins-latin-600.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Structured data. Every value here is sourced from this page or from
          cv/OsmanTuraliogluCV.pdf. Do not add claims that are not in one of those.

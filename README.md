@@ -133,6 +133,7 @@ app.js                      tab navigation, theme toggle, contact-detail assembl
 form-submission.js          contact form validation and submission
 notification.js             toast notifications (an ARIA live region)
 styles/styles.css           the ONLY stylesheet — see the note below
+fonts/                      Poppins, five weights, latin subset, woff2, self-hosted with its OFL licence
 img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run,
                             made with PromptFixer's scripts/capture-screenshot.mjs; the command is in its header)
 img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
