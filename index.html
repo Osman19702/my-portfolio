@@ -765,6 +765,74 @@
                         </div>
                     </div>
                 </article>
+
+                <article class="project-card">
+                    <figure class="project-media">
+                        <img src="./img/elastishot.png" width="1200" height="750" loading="lazy" decoding="async"
+                             alt="An Elastishot pair report for the scenario 'release', marked Failed with similarity 95.6%, 2 added, 1 removed, 6 changed and 0 moved regions. Below the mode buttons Slider, Flip, Blink, Overlay and Diff, the slider viewer shows the same product page before and after a release: a version badge, a button label and a sparkline chart are outlined as changed regions, and a green line marks the banner that was added at the top.">
+                    </figure>
+                    <div class="project-body">
+                        <div class="project-info">
+                            <div class="project-head">
+                                <div class="project-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-exchange-alt"></use></svg></div>
+                                <div>
+                                    <h3>Elastishot</h3>
+                                    <p class="project-tagline">align &middot; diff &middot; name the locator</p>
+                                </div>
+                            </div>
+                            <p class="project-desc">
+                                Visual comparison for web UIs. It lines two screenshots up before it diffs them, so a banner or a collapsed section is one change instead of a page of red, and it names the DOM element behind every region.
+                            </p>
+                            <p class="project-desc">
+                                I built it with Claude Code after one pixel-diff run too many that flagged everything. This site now runs it before every release (<code>npm run visual</code>, every section, both themes, two widths).
+                            </p>
+                            <ul class="project-points">
+                                <li>Feature alignment (ORB + RANSAC) recovers zoom, crop and shift; a strip alignment absorbs sections that grew, collapsed or moved.</li>
+                                <li>Regions are added, removed, changed or moved, each attributed to a test id, role or CSS path from an element map recorded at capture time.</li>
+                                <li>HTML report with a slider, flip, blink, overlay and diff viewer, plus JSON, JUnit and exit codes for CI. Open source, MIT, no telemetry.</li>
+                            </ul>
+                            <div class="project-stack">
+                                <span>TypeScript</span><span>Node.js</span><span>opencv.js (WASM)</span><span>Playwright</span><span>Web Components</span><span>node:test</span>
+                            </div>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 29 Gherkin scenarios driving the built CLI, plus 132 unit, engine and browser tests.</p>
+                            <p class="project-links">
+                                <a href="https://github.com/Osman19702/elastishot" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
+                            </p>
+                        </div>
+
+                        <div class="project-download">
+                            <h4>Install from npm</h4>
+                            <div class="btn-con">
+                                <a href="https://www.npmjs.com/package/elastishot"
+                                   class="main-btn project-btn" target="_blank" rel="noopener noreferrer" aria-describedby="elastishot-note">
+                                    <span class="btn-text">View on npm<span class="sr-only">: elastishot package page</span></span>
+                                    <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg></span>
+                                </a>
+                            </div>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.1.0</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cogs"></use></svg> Node.js 20 or newer; Playwright's Chromium only for page captures</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 129 KiB package (131,804 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-14">14 Sep 2026</time></p>
+
+                            <p class="project-hash">
+                                <span class="project-hash-label">SHA-256</span>
+                                <code>0E42FC67CF3D3C238F6A9B955B3044700097A557002FD78A80607F7F6F46BCF4</code>
+                            </p>
+                            <p class="project-verify-label">Verify the tarball npm serves (PowerShell):</p>
+                            <pre class="project-verify"><code>npm pack elastishot@0.1.0
+Get-FileHash .\elastishot-0.1.0.tgz -Algorithm SHA256</code></pre>
+
+                            <p class="info-stats project-note" id="elastishot-note">
+                                <strong>Install with</strong> <code>npm install -D elastishot</code>. The digest above is the registry tarball's, and the GitHub release
+                                carries the same file with its <code>SHA256SUMS</code>. Releases after 0.1.0 are published from GitHub Actions with npm provenance,
+                                so the package page shows which commit and workflow built them.
+                            </p>
+                            <p class="project-links">
+                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.1.0/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
+                            </p>
+                        </div>
+                    </div>
+                </article>
             </div>
         </section>
 
