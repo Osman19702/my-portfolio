@@ -10,7 +10,9 @@
     "test:a11y": "playwright test accessibility",
     "test:report": "playwright show-report",
     "perf": "node tests/lighthouse.js",
-    "build:icons": "node scripts/build-icon-sprite.js"
+    "build:icons": "node scripts/build-icon-sprite.js",
+    "visual": "node tests/visual/run.js",
+    "visual:report": "node -e \"require('child_process').exec((process.platform==='win32'?'start \\\"\\\" ':'open ')+require('path').join(require('fs').readFileSync('.elastishot/runs/latest','utf8').trim(),'index.html'))\""
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "@axe-core/playwright": "^4.13.0",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@playwright/test": "^1.63.0",
+    "elastishot": "file:vendor/elastishot-0.1.0.tgz",
     "lighthouse": "^13.4.1"
   },
   "engines": {

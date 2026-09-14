@@ -36,3 +36,42 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 14
+
+  visual:
+    name: Visual check against master (Elastishot)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The baseline is a worktree of the target branch, captured in this
+          # same job so fonts and Chromium match the candidate exactly.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Compare the pull request with the target branch
+        # Differences exit 1 on purpose; the report is the deliverable, so the
+        # job stays green and the summary table says what moved.
+        continue-on-error: true
+        run: npm run visual -- --against origin/${{ github.base_ref }}
+
+      - name: Upload Elastishot report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: elastishot-report
+          path: .elastishot/runs/
+          retention-days: 14
+

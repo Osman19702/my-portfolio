@@ -78,6 +78,26 @@ live send was verified once, by hand, with a real browser UA.
 | `console.spec.js` | No console errors, no failed requests |
 | `projects.spec.js` | The Projects panel: versioned release-asset URL and new-tab safety, version / file / hash copies pinned to each other, the unsigned-installer note, 360px fit, axe in both themes |
 
+### Visual check before a release
+
+```bash
+npm run visual                        # working tree vs master, i.e. what is deployed
+npm run visual -- --against v2026.09  # vs any tag, branch or commit
+npm run visual:report                 # open the last report
+```
+
+`tests/visual/run.js` drives [Elastishot](https://github.com/Osman19702/elastishot),
+a screenshot comparison that aligns the two captures first and names the element
+behind every change. It checks out the reference into a temporary worktree, serves it
+and the working tree on two ports, and captures every section in both themes at 1440
+and 360 px (20 pairs, `elastishot.config.mjs`). Both sides are captured on the same
+machine in the same run, so fonts and Chromium cancel out and nothing has to be
+committed as a baseline. Exit code 1 means differences; the report in
+`.elastishot/runs/latest/index.html` shows them with a slider and the locators.
+The same script runs on every pull request in CI against the target branch and
+uploads its report as the `elastishot-report` artifact. Elastishot is installed from
+`vendor/elastishot-0.1.0.tgz` until it is published to npm.
+
 ### Expected failures
 
 None currently. Where a test documents a real, unfixed bug rather than a passing

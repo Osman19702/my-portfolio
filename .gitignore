@@ -5,3 +5,5 @@ playwright-report/
 test-results/
 /playwright/.cache/
 lighthouse-*.json
+# Elastishot visual runs (baselines are rebuilt from a git ref each time)
+.elastishot/
