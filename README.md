@@ -17,7 +17,7 @@ small scripts, **no framework and no build step**. The files in the repo root ar
 files the browser gets.
 
 It is also a work sample. The owner is a QA engineer, so the repo carries a real test
-suite — **103 Playwright tests across 9 spec files**, including accessibility scans of
+suite — **113 Playwright tests across 9 spec files**, including accessibility scans of
 every panel in both themes, and they run in CI on every push and pull request.
 
 ## Stack
@@ -76,7 +76,7 @@ live send was verified once, by hand, with a real browser UA.
 | `responsive.spec.js` | 360 / 768 / 1440 — horizontal scroll and content clipping |
 | `seo.spec.js` | Metadata, Open Graph, JSON-LD, robots, sitemap, favicons |
 | `console.spec.js` | No console errors, no failed requests |
-| `projects.spec.js` | The Projects panel: versioned release-asset URL and new-tab safety, version / file / hash copies pinned to each other, the unsigned-installer note, 360px fit, axe in both themes |
+| `projects.spec.js` | The Projects panel, one card per project (PromptFixer, Elastishot): versioned release or package URL and new-tab safety, version / file / hash copies pinned to each other, the note that says what the visitor gets, 360px fit, axe in both themes |
 
 ### Visual check before a release
 
@@ -135,6 +135,8 @@ notification.js             toast notifications (an ARIA live region)
 styles/styles.css           the ONLY stylesheet — see the note below
 img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run,
                             made with PromptFixer's scripts/capture-screenshot.mjs; the command is in its header)
+img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
+                            made with Elastishot's scripts/capture-portfolio-shot.mjs; the command is in its header)
 scripts/build-icon-sprite.js  regenerates the sprite from Font Awesome
 tests/e2e/                  Playwright specs
 tests/static-server.js      zero-dependency static server for local and CI runs
