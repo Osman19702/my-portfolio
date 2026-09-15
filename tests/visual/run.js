@@ -98,13 +98,16 @@ function summarise(runDir) {
     git('worktree', 'add', '--detach', worktree, ref);
     const baselines = path.join(ROOT, '.elastishot', 'baselines', ref.replace(/[^\w.-]+/g, '_'));
     fs.rmSync(baselines, { recursive: true, force: true });
+    const approvalRun = fs.mkdtempSync(path.join(os.tmpdir(), 'portfolio-baseline-run-'));
     const base = serve(worktree, PORT_BASE);
     const head = serve(ROOT, PORT_HEAD);
     try {
         await waitForServer(base.url);
         await waitForServer(head.url);
         console.log(`\n== baseline: ${ref} (${sha}) served from ${worktree}`);
-        const approved = await elastishot(['run', '--config', CONFIG, '--update'], { VISUAL_PORT: String(PORT_BASE), VISUAL_BASELINES: baselines });
+        // The approval pass is only a capture; its run folder would otherwise
+        // sit next to the comparison in .elastishot/runs and in the CI artifact.
+        const approved = await elastishot(['run', '--config', CONFIG, '--update', '--out', approvalRun], { VISUAL_PORT: String(PORT_BASE), VISUAL_BASELINES: baselines });
         // A section that does not exist yet on the reference (a new tab) is an
         // error on this side and a "new" pair on the next; only a reference
         // that captured nothing at all is a failure.
@@ -123,6 +126,7 @@ function summarise(runDir) {
     } finally {
         base.child.kill();
         head.child.kill();
+        fs.rmSync(approvalRun, { recursive: true, force: true });
         try {
             git('worktree', 'remove', '--force', worktree);
         } catch {

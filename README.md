@@ -95,8 +95,8 @@ machine in the same run, so fonts and Chromium cancel out and nothing has to be
 committed as a baseline. Exit code 1 means differences; the report in
 `.elastishot/runs/latest/index.html` shows them with a slider and the locators.
 The same script runs on every pull request in CI against the target branch and
-uploads its report as the `elastishot-report` artifact. Elastishot is installed from
-`vendor/elastishot-0.1.0.tgz` until it is published to npm.
+uploads its report as the `elastishot-report` artifact. Elastishot comes from npm
+(`elastishot@^0.1.2`, a devDependency).
 
 ### Expected failures
 
