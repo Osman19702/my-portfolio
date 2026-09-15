@@ -44,7 +44,8 @@ GROUND TRUTH — read these before proposing anything
   Section ids: #home #about #certifications #projects #contact (five; #portfolio was
   removed, #projects added with the PromptFixer card).
   The controls are <button role="tab"> with a roving tabindex - preserve that.
-- External deps: Google Fonts Poppins ONLY. Font Awesome was removed in favour of
+- External deps: NONE at runtime. Poppins is self-hosted under fonts/ (OFL, five
+  latin woff2 files, @font-face rules at the top of styles.css). Font Awesome was removed in favour of
   an inline SVG sprite; do not reintroduce the CDN stylesheet.
 - All five Poppins weights (400/500/600/700/800) are genuinely used in CSS.
   None can be dropped - this was checked.
@@ -53,7 +54,8 @@ GROUND TRUTH — read these before proposing anything
   until that directive is updated. Check the browser console after any such change.
 - The email and phone exist ONLY as data attributes, reassembled by app.js. Never write
   either back into the markup in plain form, and never re-add "email" to the JSON-LD.
-- Do NOT add rel=preload for the Google font files. It was measured (LCP -157ms
+- The two weights the first screen uses (400/600) ARE preloaded now that the files are local.
+  Historical note: preloading the Google-hosted files was rejected. It was measured (LCP -157ms
   for one preload) and rejected: the URLs pin Poppins v24 and will 404 silently
   when Google rotates, which also fails the CI no-4xx check for an external
   reason. Revisit only with a self-hosted font.

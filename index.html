@@ -8,8 +8,7 @@
 
     <!--
       Content-Security-Policy. Origins allowed, and why:
-        fonts.googleapis.com  the Poppins stylesheet
-        fonts.gstatic.com     the font files that stylesheet references
+        (fonts are self-hosted under ./fonts; no font origin is contacted)
         api.web3forms.com     the contact form POST
       No 'unsafe-inline' is needed anywhere: the page has no inline script,
       no inline style attribute and no inline event handler.
@@ -33,7 +32,7 @@
       localhost, which is exactly why 85 green tests said nothing.
       Both would be fixed by moving to a host that sets response headers.
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.web3forms.com">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; img-src 'self'; script-src 'self' 'sha256-q75XMVQqr4fSTfHNlno+IN9UhARLLSPbcnpPv2BJ1mY='; style-src 'self'; font-src 'self'; connect-src https://api.web3forms.com">
 
     <!--
       Applied before first paint so a returning visitor never sees a flash of
@@ -80,9 +79,13 @@
     <meta name="twitter:image:alt" content="Osman Turalioglu, Senior QA Engineer. ISTQB CT-AI and CTAL-TAE certified.">
 
     <link rel="stylesheet" href="styles/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Poppins is self-hosted (fonts/, OFL). The two weights the first screen
+         uses (400 body, 600 headings and buttons) are preloaded so the hero
+         paints in the right face; the other weights load on demand from the
+         @font-face rules in styles.css. Measured: only these two load on the
+         home tab, so a third preload would be a wasted request. -->
+    <link rel="preload" href="./fonts/poppins-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/poppins-latin-600.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Structured data. Every value here is sourced from this page or from
          cv/OsmanTuraliogluCV.pdf. Do not add claims that are not in one of those.
@@ -769,7 +772,7 @@
                 <article class="project-card">
                     <figure class="project-media">
                         <img src="./img/elastishot.png" width="1200" height="750" loading="lazy" decoding="async"
-                             alt="An Elastishot pair report for the scenario 'release', marked Failed with similarity 95.6%, 2 added, 1 removed, 6 changed and 0 moved regions. Below the mode buttons Slider, Flip, Blink, Overlay and Diff, the slider viewer shows the same product page before and after a release: a version badge, a button label and a sparkline chart are outlined as changed regions, and a green line marks the banner that was added at the top.">
+                             alt="An Elastishot pair report for the scenario 'release', marked Failed with similarity 95.6%, 2 added, 1 removed, 6 changed and 0 moved regions. Below the mode buttons Slider, Flip, Blink, Overlay and Diff, the slider viewer shows the same product page before and after a release: a green-tinted gap with a green outline marks the banner that was added at the top, and a version badge, a button label and a sparkline chart are outlined as changed regions.">
                     </figure>
                     <div class="project-body">
                         <div class="project-info">
@@ -789,12 +792,12 @@
                             <ul class="project-points">
                                 <li>Feature alignment (ORB + RANSAC) recovers zoom, crop and shift; a strip alignment absorbs sections that grew, collapsed or moved.</li>
                                 <li>Regions are added, removed, changed or moved, each attributed to a test id, role or CSS path from an element map recorded at capture time.</li>
-                                <li>HTML report with a slider, flip, blink, overlay and diff viewer, plus JSON, JUnit and exit codes for CI. Open source, MIT, no telemetry.</li>
+                                <li>HTML report with a slider, flip, blink, overlay and diff viewer that keeps both sides lined up below an inserted or removed section, plus JSON, JUnit and exit codes for CI. Open source, MIT, no telemetry.</li>
                             </ul>
                             <div class="project-stack">
                                 <span>TypeScript</span><span>Node.js</span><span>opencv.js (WASM)</span><span>Playwright</span><span>Web Components</span><span>node:test</span>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 29 Gherkin scenarios driving the built CLI, plus 132 unit, engine and browser tests.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 29 Gherkin scenarios driving the built CLI, plus 142 unit, engine and browser tests.</p>
                             <p class="project-links">
                                 <a href="https://github.com/Osman19702/elastishot" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
                             </p>
@@ -809,26 +812,26 @@
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg></span>
                                 </a>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.1.0</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.1.2</span></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cogs"></use></svg> Node.js 20 or newer; Playwright's Chromium only for page captures</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 129 KiB package (131,804 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-14">14 Sep 2026</time></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 137 KiB package (139,781 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-15">15 Sep 2026</time></p>
 
                             <p class="project-hash">
                                 <span class="project-hash-label">SHA-256</span>
-                                <code>0E42FC67CF3D3C238F6A9B955B3044700097A557002FD78A80607F7F6F46BCF4</code>
+                                <code>7AE3605F9257C356D02A8FEC0E0A8559075A520891E8E7FDDF89B4897299C1FB</code>
                             </p>
                             <p class="project-verify-label">Verify the tarball npm serves (PowerShell):</p>
-                            <pre class="project-verify"><code>npm pack elastishot@0.1.0
-Get-FileHash .\elastishot-0.1.0.tgz -Algorithm SHA256</code></pre>
+                            <pre class="project-verify"><code>npm pack elastishot@0.1.2
+Get-FileHash .\elastishot-0.1.2.tgz -Algorithm SHA256</code></pre>
 
                             <p class="info-stats project-note" id="elastishot-note">
                                 <strong>Install with</strong> <code>npm install -D elastishot</code>. The digest above is the registry tarball's, and the GitHub release
-                                carries the same file with its <code>SHA256SUMS</code>. Releases after 0.1.0 are published from GitHub Actions with npm provenance,
-                                so the package page shows which commit and workflow built them.
+                                carries the same file with its <code>SHA256SUMS</code>. Since 0.1.1 every release is published from GitHub Actions with npm provenance,
+                                so the package page shows which commit and workflow built it.
                             </p>
                             <p class="project-links">
-                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.1.0/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
+                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.1.2/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
                             </p>
                         </div>
                     </div>

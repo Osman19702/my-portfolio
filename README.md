@@ -95,8 +95,8 @@ machine in the same run, so fonts and Chromium cancel out and nothing has to be
 committed as a baseline. Exit code 1 means differences; the report in
 `.elastishot/runs/latest/index.html` shows them with a slider and the locators.
 The same script runs on every pull request in CI against the target branch and
-uploads its report as the `elastishot-report` artifact. Elastishot is installed from
-`vendor/elastishot-0.1.0.tgz` until it is published to npm.
+uploads its report as the `elastishot-report` artifact. Elastishot comes from npm
+(`elastishot@^0.1.2`, a devDependency).
 
 ### Expected failures
 
@@ -133,6 +133,7 @@ app.js                      tab navigation, theme toggle, contact-detail assembl
 form-submission.js          contact form validation and submission
 notification.js             toast notifications (an ARIA live region)
 styles/styles.css           the ONLY stylesheet — see the note below
+fonts/                      Poppins, five weights, latin subset, woff2, self-hosted with its OFL licence
 img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run,
                             made with PromptFixer's scripts/capture-screenshot.mjs; the command is in its header)
 img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
