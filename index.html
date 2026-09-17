@@ -705,7 +705,7 @@
                 <article class="project-card">
                     <figure class="project-media">
                         <img src="./img/promptfixer.png" width="1200" height="750" loading="lazy" decoding="async"
-                             alt="PromptFixer window. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues. Right: the local model's rewrite scored 93, up 51, with a summary of what changed, per-category bars for clarity, specificity, context, format and structure, and the rewritten prompt, which names the audience, asks for bullet points and caps the length at 200 words.">
+                             alt="PromptFixer window. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues. Right: the local model's rewrite scored 93, up 51, with a summary of what changed and per-category bars for clarity, specificity, context, format and structure. Under them a marking bar offers 'Keep it &mdash; I loved it' and 'Change it &mdash; I didn't like it', counts 1 kept and 1 to change, and has a 'Fix again with my marks' button. In the rewritten prompt, the sentence that names the audience and asks for bullet points is highlighted green as kept, and the sentence that caps the length at 200 words is highlighted red, to be changed.">
                     </figure>
                     <div class="project-body">
                         <div class="project-info">
@@ -726,11 +726,12 @@
                                 <li>Scores a prompt instantly against ~30 prompt-engineering rules.</li>
                                 <li>Rewrites it with a local model (Qwen3-4B via node-llama-cpp). Runs offline; nothing you type leaves the machine.</li>
                                 <li>Re-scores the rewrite and shows a word-level diff with a change log for every edit.</li>
+                                <li>New in 0.2.0 (in the source on GitHub; the installer here is still 0.1.0): select any passage of the rewrite, mark it <em>Keep it</em> or <em>Change it</em>, and fix again. The model revises its own rewrite instead of starting over, and a guard checks that what you kept came back word for word.</li>
                             </ul>
                             <div class="project-stack">
-                                <span>Electron</span><span>React</span><span>TypeScript</span><span>Vite</span><span>Node.js / Express</span><span>node-llama-cpp</span><span>Playwright</span>
+                                <span>Electron</span><span>React</span><span>TypeScript</span><span>Vite</span><span>Node.js / Express</span><span>node-llama-cpp</span><span>Playwright</span><span>Elastishot</span>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 95 Gherkin scenarios, run with Playwright.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 113 Gherkin scenarios, 102 of them automated with Playwright, plus 236 unit and component tests. The interface is checked against approved screenshots with Elastishot.</p>
                             <p class="project-links">
                                 <a href="https://github.com/Osman19702/PromptFixer" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
                             </p>
