@@ -134,8 +134,9 @@ form-submission.js          contact form validation and submission
 notification.js             toast notifications (an ARIA live region)
 styles/styles.css           the ONLY stylesheet — see the note below
 fonts/                      Poppins, five weights, latin subset, woff2, self-hosted with its OFL licence
-img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run,
-                            made with PromptFixer's scripts/capture-screenshot.mjs; the command is in its header)
+img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run with one
+                            passage of the rewrite kept and one marked for change, made with PromptFixer's
+                            scripts/capture-screenshot.mjs; the command is in its header)
 img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
                             made with Elastishot's scripts/capture-portfolio-shot.mjs; the command is in its header)
 scripts/build-icon-sprite.js  regenerates the sprite from Font Awesome
