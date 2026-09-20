@@ -794,11 +794,12 @@
                                 <li>Feature alignment (ORB + RANSAC) recovers zoom, crop and shift; same-size captures are then aligned row by row, and side-by-side columns that move on their own get their own lanes, so a section that grew, collapsed or moved is one change, not a page of them.</li>
                                 <li>Regions are added, removed, changed or moved, each attributed to a test id, role or CSS path from an element map recorded at capture time.</li>
                                 <li>HTML report with a slider, flip, blink, overlay and diff viewer that keeps both sides lined up below an inserted or removed section, plus JSON, JUnit and exit codes for CI. Open source, MIT, no telemetry.</li>
+                                <li>New in 0.2.0: a card whose picture is redrawn while its two columns grow by different amounts is reported column by column. That case used to come out as stripes of added and removed rows straight across the card, with text that had only moved marked as changed.</li>
                             </ul>
                             <div class="project-stack">
                                 <span>TypeScript</span><span>Node.js</span><span>opencv.js (WASM)</span><span>Playwright</span><span>Web Components</span><span>node:test</span>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 29 Gherkin scenarios driving the built CLI, plus 182 unit, engine and browser tests. On its ground-truth lab: 36 of 36 planted changes found, 1 false positive.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 30 Gherkin scenarios driving the built CLI, plus 224 unit, engine and browser tests. On its ground-truth lab: 43 of 43 planted changes found, 1 false positive.</p>
                             <p class="project-links">
                                 <a href="https://github.com/Osman19702/elastishot" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
                             </p>
@@ -813,18 +814,18 @@
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg></span>
                                 </a>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.1.7</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.2.0</span></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cogs"></use></svg> Node.js 20 or newer; Playwright's Chromium only for page captures</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 161 KiB package (164,479 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-16">16 Sep 2026</time></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 174 KiB package (178,401 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-20">20 Sep 2026</time></p>
 
                             <p class="project-hash">
                                 <span class="project-hash-label">SHA-256</span>
-                                <code>8AEAA05AA65FAC4DA58C8D9020437ECEFA7D8D4A218A7D1FB8AD5E4FFD21A430</code>
+                                <code>26B3928A60EF5087910A1885F56B2BFBE04D4FD4DFCF87A7878DBE03C949A124</code>
                             </p>
                             <p class="project-verify-label">Verify the tarball npm serves (PowerShell):</p>
-                            <pre class="project-verify"><code>npm pack elastishot@0.1.7
-Get-FileHash .\elastishot-0.1.7.tgz -Algorithm SHA256</code></pre>
+                            <pre class="project-verify"><code>npm pack elastishot@0.2.0
+Get-FileHash .\elastishot-0.2.0.tgz -Algorithm SHA256</code></pre>
 
                             <p class="info-stats project-note" id="elastishot-note">
                                 <strong>Install with</strong> <code>npm install -D elastishot</code>. The digest above is the registry tarball's, and the GitHub release
@@ -832,7 +833,7 @@ Get-FileHash .\elastishot-0.1.7.tgz -Algorithm SHA256</code></pre>
                                 so the package page shows which commit and workflow built it.
                             </p>
                             <p class="project-links">
-                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.1.7/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
+                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.2.0/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
                             </p>
                         </div>
                     </div>
