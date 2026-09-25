@@ -836,6 +836,16 @@ Get-FileHash .\elastishot-0.2.0.tgz -Algorithm SHA256</code></pre>
                             <p class="project-links">
                                 <a href="https://github.com/Osman19702/elastishot/releases/download/v0.2.0/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
                             </p>
+
+                            <h4 class="project-subhead">Install as a Claude Code plugin</h4>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tools"></use></svg> Elastishot is also a Claude Code plugin, from my own marketplace repo. It adds two skills, elastishot:compare-screenshots and elastishot:visual-baselines, which run the same CLI through npx, so there is no elastishot dependency to add — page captures still need Playwright's Chromium, exactly as above.</p>
+                            <p class="project-command-label">Add the marketplace, then install (in Claude Code):</p>
+                            <pre class="project-command"><code>/plugin marketplace add Osman19702/claude-plugins</code></pre>
+                            <pre class="project-command"><code>/plugin install elastishot@osman-plugins</code></pre>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-sync-alt"></use></svg> Then restart Claude Code, or run <code>/reload-plugins</code>, before the two skills appear.</p>
+                            <p class="project-links">
+                                <a href="https://github.com/Osman19702/claude-plugins" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Marketplace repo (osman-plugins)</a>
+                            </p>
                         </div>
                     </div>
                 </article>

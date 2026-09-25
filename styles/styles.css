@@ -928,6 +928,11 @@ section {
 .project-download .btn-con {
   margin-bottom: 1rem;
 }
+/* The second sub-section of the download column ("Install as a Claude Code
+   plugin"). The global reset zeroes margins, so the gap has to be stated. */
+.project-download h4.project-subhead {
+  margin-top: 1.8rem;
+}
 .project-meta {
   margin-top: 0.45rem;
   font-size: 0.78rem;
@@ -943,6 +948,7 @@ section {
   margin-top: 1rem;
 }
 .project-hash-label,
+.project-command-label,
 .project-verify-label {
   display: block;
   margin: 0.8rem 0 0.25rem;
@@ -955,10 +961,12 @@ section {
 .project-hash .project-hash-label {
   margin-top: 0;
 }
-/* Both blocks must wrap: a 64-character digest has no break opportunity and
-   would otherwise push the page sideways at 360px. Text is --color-white on
-   grey-5 (7.98:1 light, 13.6:1 dark). */
+/* All three blocks must wrap: a 64-character digest, and a 49-character
+   /plugin command, have no break opportunity and would otherwise push the
+   page sideways at 360px. Text is --color-white on grey-5 (7.98:1 light,
+   13.6:1 dark). */
 .project-hash code,
+.project-command,
 .project-verify {
   display: block;
   margin: 0;
@@ -973,6 +981,11 @@ section {
   overflow-wrap: anywhere;
   word-break: break-all;
   user-select: all;
+}
+/* One slash command per box, so the user-select: all above grabs one line.
+   Pasted together, the second line becomes an argument to the first. */
+.project-command + .project-command {
+  margin-top: 0.35rem;
 }
 .project-note {
   max-width: none;

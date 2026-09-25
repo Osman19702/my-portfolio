@@ -203,7 +203,7 @@ test.describe('Projects panel', () => {
                     expect(box, selector).not.toBeNull();
                     expect(Math.ceil(box.x + box.width), `${selector} overflows`).toBeLessThanOrEqual(361);
                 }
-                const clipped = await card.locator('.project-hash code, .project-verify')
+                const clipped = await card.locator('.project-hash code, .project-verify, .project-command')
                     .evaluateAll((els) => els.filter((el) => el.scrollWidth > el.clientWidth + 1).map((el) => el.className));
                 expect(clipped, 'hash or command hidden behind its own edge').toEqual([]);
             });
