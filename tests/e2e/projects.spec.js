@@ -3,38 +3,51 @@ const AxeBuilder = require('@axe-core/playwright').default;
 
 /**
  * The Projects panel is the one place on the site that hands a visitor
- * something to run: an installer for PromptFixer, an npm package for
- * Elastishot. What makes that safe to accept - a versioned URL on a host they
- * can inspect, a checksum to compare, a plain statement of what the file is
- * and is not - is all content, and content drifts. These tests pin it for
- * every card, and pin every copy of the version, file name and digest to
- * each other so a rebuild cannot leave one of them stale.
+ * something to run: installers and disk images for PromptFixer, an npm
+ * package for Elastishot. What makes that safe to accept - a versioned URL on
+ * a host they can inspect, a checksum to compare, a plain statement of what
+ * the file is and is not - is all content, and content drifts. These tests
+ * pin it for every download button of every card, and pin every copy of the
+ * version, file name and digest to each other so a rebuild cannot leave one
+ * of them stale.
  */
 
 const ACTIVE = /(?:^|\s)active(?:\s|$)/;
 const SHA256 = /^[0-9A-F]{64}$/i;
 
-// One entry per card, in the order the cards appear. `asset` captures the
-// version from the primary link; `sums` is where the checksum file must be.
+const PROMPTFIXER_ASSET = (file) =>
+    new RegExp(`^https://github\\.com/Osman19702/PromptFixer/releases/download/v(\\d+\\.\\d+\\.\\d+)/(PromptFixer-(\\d+\\.\\d+\\.\\d+)-${file})$`);
+
+const GATEKEEPER = [/not notarized/i, /Privacy & Security/, /Open Anyway/];
+
+// One entry per card, in the order the cards appear. `downloads` is one entry
+// per button, keyed by its data-download attribute, which also keys the hash
+// shown for that file; `asset` captures the version from the link, and `note`
+// is what the sentence the button is described by must say. `sums` is where
+// the card's checksum file must be.
 const PROJECTS = [
     {
         name: 'PromptFixer',
         repo: 'https://github.com/Osman19702/PromptFixer',
         stack: ['Electron', 'React', 'TypeScript', 'Playwright'],
-        asset: /^https:\/\/github\.com\/Osman19702\/PromptFixer\/releases\/download\/v(\d+\.\d+\.\d+)\/(PromptFixer-(\d+\.\d+\.\d+)-win-x64\.exe)$/,
+        downloads: [
+            { key: 'win-x64', asset: PROMPTFIXER_ASSET('win-x64\\.exe'), note: [/not code-signed|unsigned/i, /SmartScreen/, /Run anyway/] },
+            { key: 'mac-arm64', asset: PROMPTFIXER_ASSET('mac-arm64\\.dmg'), note: GATEKEEPER },
+            { key: 'mac-x64', asset: PROMPTFIXER_ASSET('mac-x64\\.dmg'), note: GATEKEEPER },
+        ],
         sums: (href) => href.replace(/\/[^/]+$/, '/SHA256SUMS.txt'),
         verifyMentions: (file) => file,
-        note: [/not code-signed|unsigned/i, /SmartScreen/, /Run anyway/],
     },
     {
         name: 'Elastishot',
         repo: 'https://github.com/Osman19702/elastishot',
         stack: ['TypeScript', 'Node.js', 'Playwright'],
-        asset: /^https:\/\/www\.npmjs\.com\/package\/elastishot$/,
+        downloads: [
+            { key: 'npm', asset: /^https:\/\/www\.npmjs\.com\/package\/elastishot$/, note: [/npm install -D elastishot/, /provenance/] },
+        ],
         sums: () => null,
         sumsPattern: /^https:\/\/github\.com\/Osman19702\/elastishot\/releases\/download\/v(\d+\.\d+\.\d+)\/SHA256SUMS$/,
         verifyMentions: () => 'elastishot@',
-        note: [/npm install -D elastishot/, /provenance/],
     },
 ];
 
@@ -45,6 +58,8 @@ async function openProjects(page) {
 }
 
 const cardOf = (page, i) => page.locator('#projects .project-card').nth(i);
+const buttonOf = (card, download) => card.locator(`a.project-btn[data-download="${download.key}"]`);
+const hashOf = (card, download) => card.locator(`.project-hash[data-download="${download.key}"]`);
 
 async function blocking(page) {
     const results = await new AxeBuilder({ page })
@@ -100,37 +115,54 @@ test.describe('Projects panel', () => {
                 }
             });
 
-            test('the primary link is versioned or canonical, and opens safely', async ({ page }) => {
+            test('every download link is versioned or canonical, and opens safely', async ({ page }) => {
                 await openProjects(page);
-                const link = cardOf(page, i).locator('a.project-btn');
-                await expect(link).toHaveCount(1);
-                await expect(link).toBeVisible();
-                expect(await link.getAttribute('href')).toMatch(project.asset);
-                await expect(link).toHaveAttribute('target', '_blank');
-                await expect(link).toHaveAttribute('rel', /\bnoopener\b/);
-                await expect(link).toHaveAttribute('rel', /\bnoreferrer\b/);
+                const card = cardOf(page, i);
+                // Exactly the buttons listed above: one more would be a download nothing here vouches for.
+                await expect(card.locator('a.project-btn')).toHaveCount(project.downloads.length);
+                for (const download of project.downloads) {
+                    const link = buttonOf(card, download);
+                    await expect(link, download.key).toHaveCount(1);
+                    await expect(link).toBeVisible();
+                    expect(await link.getAttribute('href'), download.key).toMatch(download.asset);
+                    await expect(link).toHaveAttribute('target', '_blank');
+                    await expect(link).toHaveAttribute('rel', /\bnoopener\b/);
+                    await expect(link).toHaveAttribute('rel', /\bnoreferrer\b/);
+                }
             });
 
             test('every copy of the version agrees: tag, file name, version shown, verify command', async ({ page }) => {
                 await openProjects(page);
                 const card = cardOf(page, i);
-                const href = await card.locator('a.project-btn').getAttribute('href');
                 const shown = (await card.locator('.project-version').textContent()).trim();
                 expect(shown).toMatch(/^\d+\.\d+\.\d+$/);
-                const m = href.match(project.asset);
-                if (m && m[1]) {
-                    expect(m[3], 'tag and file name disagree').toBe(m[1]);
-                    expect(shown).toBe(m[1]);
+                const verify = (await card.locator('.project-verify').allTextContents()).join('\n');
+                for (const download of project.downloads) {
+                    const href = await buttonOf(card, download).getAttribute('href');
+                    const m = href.match(download.asset);
+                    if (m && m[1]) {
+                        expect(m[3], `${download.key}: tag and file name disagree`).toBe(m[1]);
+                        expect(shown, `${download.key}: version shown`).toBe(m[1]);
+                    }
+                    const file = m && m[2];
+                    expect(verify, `${download.key}: the verify command names the file`).toContain(project.verifyMentions(file) + (file ? '' : shown));
                 }
-                await expect(card.locator('.project-verify')).toContainText(project.verifyMentions(m && m[2]) + (m && m[2] ? '' : shown));
             });
 
-            test('the SHA-256 is shown in full, labelled, as 64 hex characters', async ({ page }) => {
+            test('the SHA-256 of every file is shown in full, labelled, as 64 hex characters', async ({ page }) => {
                 await openProjects(page);
                 const card = cardOf(page, i);
-                await expect(card.locator('.project-hash-label')).toHaveText(/SHA-256/);
-                const shown = (await card.locator('.project-hash code').textContent()).trim();
-                expect(shown).toMatch(SHA256);
+                await expect(card.locator('.project-hash')).toHaveCount(project.downloads.length);
+                for (const download of project.downloads) {
+                    const hash = hashOf(card, download);
+                    await expect(hash, download.key).toHaveCount(1);
+                    await expect(hash.locator('.project-hash-label')).toHaveText(/SHA-256/);
+                    const shown = (await hash.locator('code').textContent()).trim();
+                    expect(shown, download.key).toMatch(SHA256);
+                }
+                // Three files, three different digests: a copied line would pass every other check.
+                const digests = await card.locator('.project-hash code').allTextContents();
+                expect(new Set(digests.map((d) => d.trim().toLowerCase())).size).toBe(digests.length);
             });
 
             test('the checksum file lives in the release the version points at', async ({ page }) => {
@@ -139,10 +171,16 @@ test.describe('Projects panel', () => {
                 const sums = card.locator('a[href*="SHA256SUMS"]');
                 await expect(sums).toHaveCount(1);
                 const href = await sums.getAttribute('href');
-                const primary = await card.locator('a.project-btn').getAttribute('href');
+                const primary = await buttonOf(card, project.downloads[0]).getAttribute('href');
                 const expected = project.sums(primary);
-                if (expected) expect(href).toBe(expected);
-                else {
+                if (expected) {
+                    expect(href).toBe(expected);
+                    // Every file on the card is in the same release as its checksum file.
+                    for (const download of project.downloads) {
+                        const other = await buttonOf(card, download).getAttribute('href');
+                        expect(project.sums(other), `${download.key} is in another release`).toBe(expected);
+                    }
+                } else {
                     expect(href).toMatch(project.sumsPattern);
                     const version = (await card.locator('.project-version').textContent()).trim();
                     expect(href.match(project.sumsPattern)[1], 'checksums belong to another version').toBe(version);
@@ -159,16 +197,18 @@ test.describe('Projects panel', () => {
                 await expect(source).toHaveAttribute('rel', /\bnoreferrer\b/);
             });
 
-            test('the note says in plain words what the visitor is getting, and describes the link', async ({ page }) => {
+            test('every button is described by a note that says in plain words what the visitor is getting', async ({ page }) => {
                 await openProjects(page);
                 const card = cardOf(page, i);
-                const note = card.locator('.project-note');
-                await expect(note).toBeVisible();
-                for (const pattern of project.note) await expect(note).toContainText(pattern);
-                const describedBy = await card.locator('a.project-btn').getAttribute('aria-describedby');
-                expect(describedBy).toBeTruthy();
-                await expect(page.locator(`#${describedBy}`)).toHaveCount(1);
-                await expect(note).toHaveAttribute('id', describedBy);
+                for (const download of project.downloads) {
+                    const describedBy = await buttonOf(card, download).getAttribute('aria-describedby');
+                    expect(describedBy, download.key).toBeTruthy();
+                    const note = page.locator(`#${describedBy}`);
+                    await expect(note, download.key).toHaveCount(1);
+                    await expect(note).toBeVisible();
+                    await expect(note).toHaveClass(/\bproject-note\b/);
+                    for (const pattern of download.note) await expect(note, download.key).toContainText(pattern);
+                }
             });
 
             test('the screenshot is a real PNG with alt text and dimensions', async ({ page, request }) => {
@@ -186,7 +226,7 @@ test.describe('Projects panel', () => {
             });
 
             // responsive.spec.js only measures the panel that is visible on load,
-            // so the digest and the command - the two things here with no natural
+            // so the digests and the commands - the things here with no natural
             // break opportunity - need their own check at the narrowest tested width.
             test('the install block fits a 360px viewport without clipping', async ({ page }) => {
                 await page.setViewportSize({ width: 360, height: 800 });
@@ -199,9 +239,14 @@ test.describe('Projects panel', () => {
                 }));
                 expect(doc.scroll, 'panel scrolls sideways').toBeLessThanOrEqual(doc.client + 1);
                 for (const selector of ['.project-hash code', '.project-verify', 'a.project-btn', '.project-note']) {
-                    const box = await card.locator(selector).boundingBox();
-                    expect(box, selector).not.toBeNull();
-                    expect(Math.ceil(box.x + box.width), `${selector} overflows`).toBeLessThanOrEqual(361);
+                    const boxes = await card.locator(selector).evaluateAll((els) =>
+                        els.map((el) => {
+                            const r = el.getBoundingClientRect();
+                            return { x: r.x, width: r.width };
+                        })
+                    );
+                    expect(boxes.length, selector).toBeGreaterThan(0);
+                    for (const box of boxes) expect(Math.ceil(box.x + box.width), `${selector} overflows`).toBeLessThanOrEqual(361);
                 }
                 const clipped = await card.locator('.project-hash code, .project-verify, .project-command')
                     .evaluateAll((els) => els.filter((el) => el.scrollWidth > el.clientWidth + 1).map((el) => el.className));

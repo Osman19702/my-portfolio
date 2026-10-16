@@ -928,6 +928,11 @@ section {
 .project-download .btn-con {
   margin-bottom: 1rem;
 }
+/* The two macOS buttons sit beside each other where the column is wide enough and wrap under each other where it is not. */
+.project-download .project-btn-row {
+  flex-wrap: wrap;
+  gap: 0.6rem 0.8rem;
+}
 /* The second sub-section of the download column ("Install as a Claude Code
    plugin"). The global reset zeroes margins, so the gap has to be stated. */
 .project-download h4.project-subhead {
