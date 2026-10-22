@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { SECTIONS, openPanel, waitForAnimations } = require('./helpers');
 
 /**
  * A page that scrolls sideways on a phone is broken, regardless of how it
@@ -28,28 +29,45 @@ async function overflowingElements(page) {
     });
 }
 
+/** Loads the page with the web fonts in and the hero finished animating in. */
+async function settledPage(page, viewport) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    await waitForAnimations(page);
+}
+
 test.describe('Responsive layout', () => {
     // The other four panels are only in the layout after their tab is clicked,
     // and each has a decorative watermark behind its title set in a large
     // font; those are measured here, on the narrowest viewport, with the web
-    // font loaded (the fallback font is narrower and used to hide the overflow).
-    test('mobile (360px): every panel stays inside the viewport once opened', async ({ page }) => {
-        await page.setViewportSize({ width: 360, height: 800 });
-        await page.goto('/');
-        await page.evaluate(() => document.fonts.ready);
-        for (const id of ['about', 'certifications', 'projects', 'contact']) {
-            await page.locator(`.control[data-id="${id}"]`).click();
-            await expect(page.locator(`#${id}`)).toHaveClass(/(?:^|\s)active(?:\s|$)/);
+    // font loaded (the fallback font is narrower and used to hide the
+    // overflow) and the panel finished scaling in. Measured any earlier, every
+    // box in the panel has no height and the check sees nothing, which is how
+    // the certifications overflow went unnoticed. One test per panel, so the
+    // known failure cannot hide a new one elsewhere.
+    for (const id of SECTIONS.filter((s) => s !== 'home')) {
+        test(`mobile (360px): the ${id} panel stays inside the viewport once opened`, async ({ page }) => {
+            test.fail(
+                id === 'certifications',
+                'Defect #28 (docs/MASTER_PROMPT.md): the title word CERTIFICATIONS, 3rem Poppins 700, is '
+                + '395px wide and cannot break, so on phones the page is 435px wide and scrolls sideways'
+            );
+
+            await settledPage(page, { width: 360, height: 800 });
+            await openPanel(page, id);
+            await waitForAnimations(page);
+            await page.evaluate(() => document.fonts.ready);
+
             const offenders = await overflowingElements(page);
             expect(offenders, `${id} panel overflows the viewport`).toEqual([]);
-        }
-    });
+        });
+    }
 
     for (const viewport of VIEWPORTS) {
         test(`${viewport.name} (${viewport.width}px) does not scroll horizontally`, async ({ page }) => {
             // Arrange
-            await page.setViewportSize({ width: viewport.width, height: viewport.height });
-            await page.goto('/');
+            await settledPage(page, viewport);
 
             // Act
             const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
@@ -75,8 +93,7 @@ test.describe('Responsive layout', () => {
 
     for (const viewport of VIEWPORTS) {
         test(`${viewport.name} (${viewport.width}px) does not clip its own text`, async ({ page }) => {
-            await page.setViewportSize({ width: viewport.width, height: viewport.height });
-            await page.goto('/');
+            await settledPage(page, viewport);
 
             // Only elements that hold text of their own. A container whose
             // scroll extent exceeds its box because of a decorative child is
@@ -114,7 +131,6 @@ test.describe('Responsive layout', () => {
         await page.setViewportSize({ width: 360, height: 800 });
         await page.goto('/');
 
-        await page.locator('.control[data-id="contact"]').click();
-        await expect(page.locator('#contact')).toHaveAttribute('class', /(?:^|\s)active(?:\s|$)/);
+        await openPanel(page, 'contact');
     });
 });

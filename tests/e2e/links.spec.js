@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { openPanel } = require('./helpers');
 
 /**
  * The CV download is the single most important conversion on the site, and
@@ -88,7 +89,7 @@ test.describe('Privacy hardening', () => {
 
     test('the email and phone are still reachable in one click', async ({ page }) => {
         await page.goto('/');
-        await page.locator('.control[data-id="contact"]').click();
+        await openPanel(page, 'contact');
 
         const mailto = page.locator('a.contact-link[href^="mailto:"]');
         await expect(mailto).toHaveCount(1);
@@ -101,7 +102,7 @@ test.describe('Privacy hardening', () => {
 
     test('the assembled links look like the surrounding text', async ({ page }) => {
         await page.goto('/');
-        await page.locator('.control[data-id="contact"]').click();
+        await openPanel(page, 'contact');
 
         const link = page.locator('a.contact-link').first();
         const parentColor = await link.evaluate(
@@ -119,18 +120,20 @@ test.describe('Privacy hardening', () => {
             .getAttribute('content');
 
         expect(policy).toBeTruthy();
-        // No escape hatches: the page genuinely has no inline script or style.
-        expect(policy).not.toContain ('unsafe');
+        // No escape hatches: the one inline script, the pre-paint theme setter,
+        // is allowed by its hash, and there is no inline style at all.
+        expect(policy).not.toContain('unsafe');
         expect(policy).toContain("default-src 'self'");
         expect(policy).toContain("object-src 'none'");
         expect(policy).toContain('connect-src https://api.web3forms.com');
     });
 
-    // Regression guard for a production-only outage. The custom domain has no
-    // certificate of its own, so the site is served over http. With
+    // Regression guard for a production-only outage. Before GitHub issued the
+    // custom domain its own certificate, the site was served over http. With
     // upgrade-insecure-requests in the policy, every same-origin subresource
     // was rewritten to https, hit the *.github.io certificate, and failed -
-    // visitors got raw unstyled HTML with no scripts.
+    // visitors got raw unstyled HTML with no scripts. A future certificate
+    // lapse would do the same.
     //
     // This suite could not have caught it: the directive exempts localhost by
     // specification, so all 85 tests passed against a site that was down.
@@ -159,7 +162,7 @@ test.describe('Privacy hardening', () => {
 
         await page.goto('/');
         await page.waitForLoadState('networkidle');
-        await page.locator('.control[data-id="contact"]').click();
+        await openPanel(page, 'contact');
 
         expect(violations).toEqual([]);
     });

@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const AxeBuilder = require('@axe-core/playwright').default;
+const { openPanel } = require('./helpers');
 
 /**
  * The Projects panel is the one place on the site that hands a visitor
@@ -9,10 +9,10 @@ const AxeBuilder = require('@axe-core/playwright').default;
  * the file is and is not - is all content, and content drifts. These tests
  * pin it for every download button of every card, and pin every copy of the
  * version, file name and digest to each other so a rebuild cannot leave one
- * of them stale.
+ * of them stale. Its accessibility is scanned, in both themes, with every
+ * other panel's in accessibility.spec.js.
  */
 
-const ACTIVE = /(?:^|\s)active(?:\s|$)/;
 const SHA256 = /^[0-9A-F]{64}$/i;
 
 const PROMPTFIXER_ASSET = (file) =>
@@ -53,28 +53,12 @@ const PROJECTS = [
 
 async function openProjects(page) {
     await page.goto('/');
-    await page.locator('.control[data-id="projects"]').click();
-    await expect(page.locator('#projects')).toHaveAttribute('class', ACTIVE);
+    await openPanel(page, 'projects');
 }
 
 const cardOf = (page, i) => page.locator('#projects .project-card').nth(i);
 const buttonOf = (card, download) => card.locator(`a.project-btn[data-download="${download.key}"]`);
 const hashOf = (card, download) => card.locator(`.project-hash[data-download="${download.key}"]`);
-
-async function blocking(page) {
-    const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-    return results.violations
-        .filter((v) => ['critical', 'serious'].includes(v.impact))
-        .map((v) => ({
-            id: v.id,
-            impact: v.impact,
-            help: v.help,
-            nodes: v.nodes.length,
-            example: v.nodes[0] && v.nodes[0].html.slice(0, 120),
-        }));
-}
 
 test.describe('Projects panel', () => {
     test('the projects tab reveals the panel and nothing else', async ({ page }) => {
@@ -93,14 +77,6 @@ test.describe('Projects panel', () => {
         await openProjects(page);
         await expect(page.locator('#projects .project-card')).toHaveCount(PROJECTS.length);
         await expect(page.locator('#projects .project-card h3')).toHaveText(PROJECTS.map((p) => p.name));
-    });
-
-    test('every icon on the panel and its tab resolves to a sprite symbol', async ({ page }) => {
-        await openProjects(page);
-        const missing = await page.locator('#projects use, #tab-projects use').evaluateAll((uses) =>
-            uses.map((u) => u.getAttribute('href')).filter((id) => !document.querySelector(`symbol${id}`))
-        );
-        expect(missing, 'a <use> without a symbol renders nothing, silently').toEqual([]);
     });
 
     for (const [i, project] of PROJECTS.entries()) {
@@ -225,9 +201,10 @@ test.describe('Projects panel', () => {
                 await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
             });
 
-            // responsive.spec.js only measures the panel that is visible on load,
-            // so the digests and the commands - the things here with no natural
-            // break opportunity - need their own check at the narrowest tested width.
+            // responsive.spec.js checks that every panel fits a 360px viewport.
+            // The digests and the commands - the things here with no natural
+            // break opportunity - also have to wrap inside their own boxes
+            // rather than clip, which only a check on those boxes can see.
             test('the install block fits a 360px viewport without clipping', async ({ page }) => {
                 await page.setViewportSize({ width: 360, height: 800 });
                 await openProjects(page);
@@ -254,24 +231,4 @@ test.describe('Projects panel', () => {
             });
         });
     }
-});
-
-test.describe('Projects panel accessibility (axe-core)', () => {
-    test('dark mode has no critical or serious violations', async ({ page }) => {
-        await page.goto('/');
-        await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(25, 29, 43)');
-        await page.locator('.control[data-id="projects"]').click();
-        await expect(page.locator('#projects')).toHaveAttribute('class', ACTIVE);
-        expect(await blocking(page)).toEqual([]);
-    });
-
-    test('light mode has no critical or serious violations', async ({ page }) => {
-        await page.goto('/');
-        await page.locator('.theme-btn').click();
-        await expect(page.locator('html')).toHaveClass(/light-mode/);
-        await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-        await page.locator('.control[data-id="projects"]').click();
-        await expect(page.locator('#projects')).toHaveAttribute('class', ACTIVE);
-        expect(await blocking(page)).toEqual([]);
-    });
 });

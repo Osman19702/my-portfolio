@@ -1,18 +1,11 @@
 const { test, expect } = require('@playwright/test');
+const { SECTIONS, ACTIVE } = require('./helpers');
 
 /**
  * The site is not scroll-based. It is a tab pattern: `.container` is
  * display:none until `.active` is applied, and app.js maps a control's
  * `data-id` onto the section id it reveals. These tests pin that contract.
  */
-
-// Every section that renders, in DOM order. The tablist must expose exactly
-// these, so adding a panel means adding it here too.
-const SECTIONS = ['home', 'about', 'certifications', 'projects', 'contact'];
-
-// `active-btn` also contains the substring "active", and a hyphen counts as a
-// word boundary, so a naive /\bactive\b/ matches both. Match the whole token.
-const ACTIVE = /(?:^|\s)active(?:\s|$)/;
 
 test.describe('Navigation - the tab contract', () => {
     test.beforeEach(async ({ page }) => {

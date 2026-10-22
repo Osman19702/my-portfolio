@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { openPanel } = require('./helpers');
 
 /**
  * The form posts to Web3Forms because GitHub Pages runs no server code. Every
@@ -14,7 +15,7 @@ const FILL_GUARD_MS = 1400;
 
 async function openContactPanel(page) {
     await page.goto('/');
-    await page.locator('.control[data-id="contact"]').click();
+    await openPanel(page, 'contact');
     await expect(page.locator('#contact-form')).toBeVisible();
 }
 

@@ -1,87 +1,44 @@
 const { test, expect } = require('@playwright/test');
-const AxeBuilder = require('@axe-core/playwright').default;
+const { SECTIONS, BACKGROUND, openPanel, waitForAnimations, blockingViolations } = require('./helpers');
 
 /**
  * Automated checks catch roughly a third of real accessibility problems, so a
- * green run here is a floor and not a certificate. Light mode is audited
- * separately because it redefines the entire palette and is the less-travelled
- * path.
+ * green run here is a floor and not a certificate. Light mode gets the same
+ * coverage as dark because it redefines the entire palette and is the
+ * less-travelled path.
  */
 
-const BLOCKING = ['critical', 'serious'];
-
-const BACKGROUND = {
-    dark: 'rgb(25, 29, 43)',      // --color-primary #191d2b
-    light: 'rgb(255, 255, 255)',  // .light-mode --color-primary #ffffff
-};
-
-/** Render violations as something readable in a CI log. */
-function summarise(violations) {
-    return violations.map((v) => ({
-        id: v.id,
-        impact: v.impact,
-        help: v.help,
-        nodes: v.nodes.length,
-        example: v.nodes[0] && v.nodes[0].html.slice(0, 120),
-    }));
-}
-
 /**
- * body carries `transition: all 0.4s` (styles.css:43), and that transition runs
- * on the first paint as well as on a theme switch. Scanning inside that window
- * measures white text against a background that has not finished darkening,
- * which produces contrast "violations" that do not exist once the page settles.
- * Waiting for the final background colour makes the scan deterministic.
+ * body carries `transition: all 0.4s`, and that transition runs on the first
+ * paint as well as on a theme switch. Scanning inside that window measures
+ * white text against a background that has not finished darkening, which
+ * produces contrast "violations" that do not exist once the page settles.
+ * Waiting for the final background colour, and for a freshly opened panel to
+ * finish animating in, makes the scan deterministic.
  */
 async function settled(page, theme) {
     await expect(page.locator('body')).toHaveCSS('background-color', BACKGROUND[theme]);
-    await page.waitForFunction(
-        () => document.getAnimations().every((a) => a.playState === 'finished'),
-        null,
-        { timeout: 5000 }
-    ).catch(() => { /* decorative loops never finish; the colour check is what matters */ });
-}
-
-async function scan(page) {
-    const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze();
-    return results.violations.filter((v) => BLOCKING.includes(v.impact));
+    await waitForAnimations(page);
 }
 
 test.describe('Accessibility (axe-core)', () => {
-    test('dark mode has no critical or serious violations', async ({ page }) => {
-        await page.goto('/');
-        await settled(page, 'dark');
+    // axe skips hidden content and four of the five panels are display:none at
+    // any moment, so each one is opened and scanned in its own right, in both
+    // themes. Scanning only the default view once meant the contact form - the
+    // only interactive content on the site - was never audited at all.
+    for (const theme of ['dark', 'light']) {
+        for (const panel of SECTIONS) {
+            test(`the ${panel} panel has no critical or serious violations in ${theme} mode`, async ({ page }) => {
+                await page.emulateMedia({ colorScheme: theme });
+                await page.goto('/');
+                if (panel !== 'home') {
+                    await openPanel(page, panel);
+                }
+                await settled(page, theme);
 
-        const blocking = await scan(page);
-        expect(summarise(blocking)).toEqual([]);
-    });
-
-    test('light mode has no critical or serious violations', async ({ page }) => {
-        await page.goto('/');
-        await page.locator('.theme-btn').click();
-        await expect(page.locator('html')).toHaveClass(/light-mode/);
-        await settled(page, 'light');
-
-        const blocking = await scan(page);
-        expect(summarise(blocking)).toEqual([]);
-    });
-
-    // Hidden panels are skipped by axe, so each one has to be revealed and
-    // scanned in its own right. Without this the contact form - the only
-    // interactive content on the site - would never be audited at all.
-    for (const panel of ['about', 'certifications', 'projects', 'contact']) {
-        test(`the ${panel} panel has no critical or serious violations`, async ({ page }) => {
-            await page.goto('/');
-            await settled(page, 'dark');
-
-            await page.locator(`.control[data-id="${panel}"]`).click();
-            await expect(page.locator(`#${panel}`)).toHaveAttribute('class', /(?:^|\s)active(?:\s|$)/);
-
-            const blocking = await scan(page);
-            expect(summarise(blocking)).toEqual([]);
-        });
+                expect(await blockingViolations(page)).toEqual([]);
+            });
+        }
     }
 
     test('the page has exactly one h1', async ({ page }) => {
@@ -123,7 +80,7 @@ test.describe('Document structure (WCAG 1.3.1, 2.4.1)', () => {
             ['projects', 'My Projects'],
             ['contact', 'Contact Me'],
         ]) {
-            await page.locator(`.control[data-id="${panel}"]`).click();
+            await openPanel(page, panel);
             const snapshot = await page.locator(`#${panel} .main-title h2`).first().ariaSnapshot();
             expect(snapshot).toContain(`heading "${expected}"`);
         }
