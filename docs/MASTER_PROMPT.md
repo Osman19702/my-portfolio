@@ -22,22 +22,23 @@ A broken or untested portfolio contradicts the CV it is advertising.
 
 GROUND TRUTH — read these before proposing anything
 - Static site, no framework, no build step. Served straight from the repo root.
-  index.html (~790 lines)  — entire page, single file, all sections inline.
-    Includes an inline SVG icon sprite; regenerate with `npm run build:icons`.
-  styles/styles.css (~1264 lines) — the LIVE stylesheet, linked by index.html
-  styles/styles.scss (~109 lines) + styles.css.map — STALE. See TRAPS.
-  app.js (~99 lines) — tab switching (ARIA tabs + roving tabindex), theme toggle,
+  index.html (~1085 lines) — entire page, single file, all sections inline.
+    Includes an inline SVG icon sprite; regenerate it with `npm run build:icons`.
+    The page is the sprite's manifest: add <use href="#i-NAME"> and re-run.
+  styles/styles.css (~1510 lines) — the ONLY stylesheet, linked by index.html.
+    (styles.scss and its source map were stale and have been deleted.)
+  app.js (~135 lines) — tab switching (ARIA tabs + roving tabindex), theme toggle,
     and reassembly of the split email/phone contact details
   form-submission.js — contact form validation, spam guards, Web3Forms POST
   notification.js — toast notifications (live region)
   (server-side.js was deleted; it could never run on static hosting)
   cv/OsmanTuraliogluCV.pdf — linked as ./cv/OsmanTuraliogluCV.pdf?v=YYYY-MM-DD
   img/og-image.png — the 1200x630 social card
-  tests/ + playwright.config.js — 49 Playwright tests across 7 specs (devDeps only)
+  tests/ + playwright.config.js — 121 Playwright tests across 10 specs (devDeps only);
+    `npm run visual` compares the working tree with master screenshot by screenshot
   .github/workflows/ci.yml — runs the suite on push and PR to master
   CNAME -> www.osmanturalioglu.com ; deploys from branch `master`
-- Run the site locally with `npm run serve` (zero-dependency static server).
-  `npm start` runs the dead Express file and needs deps that are not installed.
+- Run the site locally with `npm start` (zero-dependency static server, port 4173).
 - Navigation is NOT scroll-based. It is a tab/SPA pattern:
   `.container { display: none }` + `.active { display: block }`.
   app.js reads `data-id` off `.control` buttons and toggles `.active` on `#<data-id>`.
@@ -64,7 +65,8 @@ HARD CONSTRAINTS — violating any of these is a failed task
 1. Do not break the deploy. The site must remain a set of static files servable from the
    repo root with no build step, unless I explicitly approve introducing one. Keep CNAME.
    Use relative paths (./cv/...), never absolute paths that assume a subdirectory.
-2. Do not touch styles/styles.scss or run a Sass build without asking. See TRAPS.
+2. Do not reintroduce Sass or any CSS preprocessor without asking. styles.css is the
+   single source of truth; see the README's note on Sass.
 3. Preserve the tab contract: the `data-id` <-> section-`id` mapping, the `.active` /
    `.active-btn` class names, and all five section ids. If you refactor the nav, prove the
    contract still holds before you finish.
@@ -77,20 +79,23 @@ HARD CONSTRAINTS — violating any of these is a failed task
 7. Do not commit or push unless I ask. Show me the diff.
 
 TRAPS — real hazards discovered in this repo
-- styles.scss is 109 lines; styles.css is 1300. The SCSS is a stale fragment, not the source.
-  Running `sass` would silently delete ~1200 lines of live styling. Treat styles.css as the
-  single source of truth until we consciously fix this (see UC-8).
-- THE STALE SCSS ALSO HAS A DIFFERENT PALETTE. styles.scss declares
-  --color-secondary: #27ae60 (green). The LIVE styles.css declares #457fe4 (blue) in :root
-  and #0dbae1 (cyan) under .light-mode. Any colour you take from the SCSS will be off-brand.
-  Read colour values from styles/styles.css only, and confirm against a rendered screenshot.
+- The media queries in styles.css run widest first (1432 -> 1250 -> 1070 -> 970 -> 700 -> 600),
+  so a narrower breakpoint always wins a tie. A 600px rule placed above the 700px block is
+  silently overridden - that is how the intended phone title sizes never applied. Keep the
+  order, and do not reach for !important to win a fight that ordering should settle.
+- Read colour values from styles/styles.css (:root and .light-mode) only, and confirm against
+  a rendered screenshot. The accent is #558ae6 in dark mode and #09809b in light, both tuned
+  for AA; older notes that mention #457fe4 or #0dbae1 predate that fix.
 - There is NO server. GitHub Pages serves static files only. The contact form posts to
   Web3Forms; index.html holds a public access key. The site has ZERO runtime dependencies
   and must stay that way.
 - axe only scans VISIBLE content, and four of the five panels are display:none at any moment.
   A panel must be revealed before it is audited - scanning only the default view silently
   skipped the entire contact form until UC-5.
-- Light mode is a body class only. It does not persist and does not read prefers-color-scheme.
+- Theme is a `light-mode` class on <html>, set before first paint by an inline script that
+  reads the stored choice, then prefers-color-scheme. The CSP allows that one script by its
+  sha256 hash: edit it and you must regenerate the hash, or the browser silently refuses to
+  run it (links.spec.js catches the drift).
 
 WORKING METHOD
 1. Read the actual files first. Never propose a change based on assumption about the stack.
@@ -394,8 +399,8 @@ Found by reading the repo; each is real and reproducible today.
 | 10 | ~~Theme not persisted, ignores `prefers-color-scheme`~~ **FIXED** (fe33978) - stored in localStorage, pre-paint script, OS fallback | - | - |
 | 11 | ~~At 360px content is clipped~~ **NOT A DEFECT** - the only thing overflowing was `.header-shapes`, decorative circles clipped by `overflow:hidden` on purpose. The heading wraps correctly and no text is cut. The original screenshot that suggested otherwise was captured before Poppins loaded, so fallback metrics made it look clipped. The test now measures clipped *text*, not decoration | - | Lesson: verify a layout finding with fonts loaded |
 | 12 | ~~Light-mode accent below AA~~ **FIXED** (441d3fe) - four contrast failures corrected; axe now reports 0 violating nodes across 4 panels x 2 themes | - | - |
-| 13 | `styles.scss` palette (`#27ae60`) diverges from live `styles.css` (`#457fe4`) | styles/ | Any colour sourced from the SCSS is off-brand |
-| 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css:43 | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
+| 13 | ~~`styles.scss` palette (`#27ae60`) diverges from live `styles.css` (`#457fe4`)~~ **MOOT** - `styles.scss` was deleted (d12a7a8) | - | - |
+| 14 | `body { transition: all 0.4s }` runs on first paint, so for ~400ms after load white text sits on a background still darkening toward `#191d2b` | styles.css, `body` rule | Automated contrast scans read a real low-contrast window at load; worth confirming whether a human sees a flash |
 | 15 | ~~A commented-out `.blogs` feature remains in `styles.css` (~51 lines) with three live orphaned media-query rules; no markup has ever referenced it~~ **FIXED** (feat/projects-section) - the block was replaced by the Projects panel styles and the orphaned media-query rules were removed | - | - |
 | 16 | `tests/static-server.js` resolved its root from `__dirname/..`, so `cd`-ing elsewhere still served the repo root - it silently invalidated a before/after comparison | fixed (2798137) | Now honours `STATIC_ROOT`; always verify two servers serve different builds before trusting a diff |
 | 17 | ~~index.html carries `WEB3FORMS_ACCESS_KEY_HERE`~~ **FIXED** - real key wired in and verified end-to-end against the live API (HTTP 200, `success:true`, success toast, form cleared) | - | The guard remains and is now driven by tests that set the placeholder explicitly |
@@ -403,3 +408,11 @@ Found by reading the repo; each is real and reproducible today.
 | 19 | An inline pre-paint script is required for the theme, but the CSP forbids `unsafe-inline`. Resolved with a sha256 hash in `script-src` (fe33978). Editing that script without regenerating the hash silently disables it | index.html | The CSP test catches the drift |
 | 20 | `api.web3forms.com` sits behind Cloudflare, which **403s the CORS preflight for headless-browser and `curl` user agents**. A live submission from stock headless Chromium fails with "No 'Access-Control-Allow-Origin' header", which looks exactly like a domain restriction and is not one | tests | Never conclude "the key/domain is wrong" from a headless CORS failure; retry with a real browser UA first. This is also why the specs mock the endpoint rather than hitting it |
 | 21 | `upgrade-insecure-requests` in the CSP **took the live site down**. GitHub never issued a certificate for the custom domain, so Pages serves it over http; the directive then rewrote every same-origin subresource to https, where the `*.github.io` cert does not match. styles.css and all three scripts failed - visitors got raw unstyled HTML | fixed (index.html) | **The whole suite stayed green through the outage**: the directive exempts localhost by spec, so a local server structurally cannot reproduce it. Green tests are not evidence about production. The certificate was issued later the same day (CN=www.osmanturalioglu.com, 2026-09-06 15:29Z) and http now 301s to https, so the outage is over - but the directive stays out, because it would turn any future certificate lapse from a warning into a blank site |
+| 22 | ~~The Elastishot card's `i-cogs` icon carried a 512-wide `viewBox` for a 640-wide symbol, so it was drawn a fifth too small~~ **FIXED** - `build-icon-sprite.js` now regenerates the sprite from the page's `<use>` references and copies each symbol's `viewBox` onto its icons; `icons.spec.js` fails on any mismatch | - | The sprite had been hand-maintained since the generator stopped working; this was the drift that produced |
+| 23 | At 600px and below, the section titles were meant to be `2rem` (accent word `2.3rem`), but the 700px block came later in the file and won, so phones get `3rem`. The dead rules were removed when the breakpoints were put in widest-first order; rendering is unchanged | styles.css, 600px block | Decide whether phones should get the smaller titles. It is now a one-line change in the 600px block |
+| 24 | At 600px and below, `.contact-item .icon { grid-template-columns: 25px 1fr }` never applied: the base rule's five-class selector outranks it. Removed as dead; rendering unchanged | styles.css | If the narrower icon column is wanted on phones, it needs the base rule's selector |
+| 25 | Two rules said `header { padding: 0 !important }`, but on phones `.container { padding: 2rem 2.5rem !important }` outranked both, so the hero is inset like every panel. Kept as rendered and now stated outright (`.container.header`) instead of falling out of `!important` specificity | styles.css | Confirm the inset hero on phones is wanted. It makes the hero 4rem taller (measured at 360x800: 974px of content, 1038px of hero) |
+| 26 | ~~The timeline showed the Emirates role as "Present" while the JSON-LD gave it an end date~~ **FIXED** - the timeline now matches the JSON-LD: May 2024 – Aug 2026 | - | - |
+| 27 | `.cert-icon` and `.project-icon` circles are tinted `rgba(69, 127, 228, 0.15)`, the pre-AA accent `#457fe4`, not `--color-secondary`. In light mode the circle is blue behind a teal (`#09809b`) icon | styles.css | Design call; `color-mix(in srgb, var(--color-secondary) 15%, transparent)` would follow the theme |
+| 28 | **On phones the Certifications tab scrolls sideways.** The title word CERTIFICATIONS (3rem, Poppins 700) is 395px wide and cannot break, so the page is 435px wide at 320, 360 and 414px viewports. Live on master; pinned by an expected failure in responsive.spec.js | styles.css, `.main-title h2` at 600px and below | Needs a design decision. Measured: the never-applied 2.3rem from #23 fixes 360-414px but still scrolls at 320px (page 343px); `min(3rem, 9vw)` fits at 320, 360, 390 and 414px. Or let the word break |
+| 29 | ~~responsive.spec.js measured each panel the moment it became active, while it was still scaling in from scaleY(0): every box had zero height and the overflow check skipped them all, so #28 passed. accessibility.spec.js waited for all animations, timed out on the hero's infinite loops and swallowed the timeout~~ **FIXED** - both wait for finite animations to finish (`waitForAnimations` in tests/e2e/helpers.js) | - | Lesson: a geometry check needs proof it measured something. This one had passed since it was added (b3c175a, 2026-09-14) because it measured panels still at zero height; whether it saw anything came down to timing |

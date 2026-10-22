@@ -17,7 +17,7 @@ small scripts, **no framework and no build step**. The files in the repo root ar
 files the browser gets.
 
 It is also a work sample. The owner is a QA engineer, so the repo carries a real test
-suite — **113 Playwright tests across 9 spec files**, including accessibility scans of
+suite — **121 Playwright tests across 10 spec files**, including accessibility scans of
 every panel in both themes, and they run in CI on every push and pull request.
 
 ## Stack
@@ -76,7 +76,11 @@ live send was verified once, by hand, with a real browser UA.
 | `responsive.spec.js` | 360 / 768 / 1440 — horizontal scroll and content clipping |
 | `seo.spec.js` | Metadata, Open Graph, JSON-LD, robots, sitemap, favicons |
 | `console.spec.js` | No console errors, no failed requests |
-| `projects.spec.js` | The Projects panel, one card per project (PromptFixer, Elastishot): a versioned release or package URL and new-tab safety for every download button (PromptFixer has three: Windows, macOS on Apple Silicon, macOS on Intel), version / file / hash copies pinned to each other, the note that says what the visitor gets, 360px fit, axe in both themes |
+| `projects.spec.js` | The Projects panel, one card per project (PromptFixer, Elastishot): a versioned release or package URL and new-tab safety for every download button (PromptFixer has three: Windows, macOS on Apple Silicon, macOS on Intel), version / file / hash copies pinned to each other, the note that says what the visitor gets, 360px fit |
+| `icons.spec.js` | Every icon resolves to a sprite symbol and carries that symbol's `viewBox`; no unused symbols |
+
+Shared constants and helpers (the section list, opening a panel, the axe scan) live in
+`tests/e2e/helpers.js`.
 
 ### Visual check before a release
 
@@ -96,15 +100,22 @@ committed as a baseline. Exit code 1 means differences; the report in
 `.elastishot/runs/latest/index.html` shows them with a slider and the locators.
 The same script runs on every pull request in CI against the target branch and
 uploads its report as the `elastishot-report` artifact. Elastishot comes from npm
-(`elastishot@^0.1.2`, a devDependency).
+(`elastishot@^0.2.0`, a devDependency).
 
 ### Expected failures
 
-None currently. Where a test documents a real, unfixed bug rather than a passing
+One, currently. Where a test documents a real, unfixed bug rather than a passing
 behaviour, it carries a `test.fail()` annotation naming the defect. If the bug is later
 fixed, Playwright reports *"expected to fail but passed"* and forces the annotation to
-be removed — so they cannot rot silently. Six were used during this work and all have
-now been retired by fixing the underlying bugs.
+be removed — so they cannot rot silently.
+
+- `responsive.spec.js` › *the certifications panel stays inside the viewport once
+  opened*. On phones the title word CERTIFICATIONS (3rem, Poppins 700) is 395px wide and
+  cannot break, so the page is 435px wide and scrolls sideways at 320–414px (defect #28
+  in `docs/MASTER_PROMPT.md`). The check used to pass only because it measured the panel
+  while it was still scaling in from zero height, when there was nothing to overflow.
+
+Six others were used earlier and have been retired by fixing the underlying bugs.
 
 ## Performance
 
@@ -140,9 +151,11 @@ img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a re
 img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
                             made with Elastishot's scripts/capture-portfolio-shot.mjs; the command is in its header)
 scripts/build-icon-sprite.js  regenerates the sprite from Font Awesome
-tests/e2e/                  Playwright specs
+tests/e2e/                  Playwright specs, plus helpers.js shared between them
 tests/static-server.js      zero-dependency static server for local and CI runs
+tests/serve.js              starts that server for the scripts below and waits until it is listening
 tests/lighthouse.js         repeatable performance measurement
+tests/visual/run.js         visual check against a git ref, driving Elastishot (elastishot.config.mjs)
 docs/MASTER_PROMPT.md       working notes, constraints and the defect backlog
 .github/workflows/ci.yml    runs the suite on push and PR
 ```
@@ -158,14 +171,21 @@ preprocessor without also removing this note.
 
 ### Editing icons
 
-Icons come from an inline sprite in `index.html`, not a webfont or a CDN. The sprite was
-generated once by `scripts/build-icon-sprite.js` from the original `<i class="fas …">`
-tags. Those tags no longer exist, so the generator now exits with "No Font Awesome `<i>`
-tags found" and **must not be run**: it strips the existing sprite before it looks for
-anything. To add an icon, copy the `viewBox` and `<path>` from
-`node_modules/@fortawesome/fontawesome-free/svgs/<style>/<name>.svg` into a new
-`<symbol id="i-<name>">` by hand (see `i-windows`), then reference it with
-`<use href="#i-<name>">`.
+Icons come from an inline sprite in `index.html`, not a webfont or a CDN, and the page
+itself is the sprite's manifest. To add an icon, write it where it should appear:
+
+```html
+<svg class="svg-icon" aria-hidden="true" focusable="false"><use href="#i-NAME"></use></svg>
+```
+
+then run `npm run build:icons`. `scripts/build-icon-sprite.js` looks `NAME` up in Font
+Awesome's solid set, then its brands set (`node_modules/@fortawesome/fontawesome-free/svgs/`),
+rewrites the sprite between its markers with one `<symbol>` per icon the page uses, and
+copies each symbol's `viewBox` onto every icon that uses it. An icon nothing references any
+more drops out on the next run, and running it twice changes nothing. Do not edit the
+sprite by hand. `icons.spec.js` fails if an icon has no symbol, or a `viewBox` that
+disagrees with its symbol's, which shrinks the glyph: a 640-wide icon in a 512-wide box is
+drawn a fifth too small.
 
 Font Awesome Free icons are used under **CC BY 4.0**; the attribution is in the sprite.
 
