@@ -34,7 +34,16 @@ const MIME = {
 };
 
 const server = http.createServer((req, res) => {
-    const urlPath = decodeURIComponent(req.url.split('?')[0]);
+    let urlPath;
+    try {
+        urlPath = decodeURIComponent(req.url.split('?')[0]);
+    } catch {
+        // A malformed escape such as /%E0%A4%A throws URIError, and an
+        // uncaught throw here would take the whole server down mid-suite.
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad request');
+        return;
+    }
     const relative = urlPath === '/' ? 'index.html' : urlPath.replace(/^\/+/, '');
     const filePath = path.resolve(ROOT, relative);
 
@@ -57,6 +66,13 @@ const server = http.createServer((req, res) => {
     });
 });
 
+// tests/serve.js waits for this exact line, so a script never mistakes some
+// other process already on the port for this server.
 server.listen(PORT, '127.0.0.1', () => {
     console.log('static server listening on http://127.0.0.1:' + PORT);
+});
+
+server.on('error', (error) => {
+    console.error(`static server could not listen on port ${PORT}: ${error.message}`);
+    process.exit(1);
 });

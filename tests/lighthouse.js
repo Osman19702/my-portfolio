@@ -1,22 +1,22 @@
 /**
  * Repeatable Lighthouse measurement for the local build.
  *
- *   node tests/lighthouse.js [runs] [label]
+ *   node tests/lighthouse.js [runs] [label] [root]
  *
  * Lighthouse is noisy, so this runs several times and reports the median of
  * each metric. Numbers are from a local static server: absolute values are
  * optimistic compared with GitHub Pages, but the before/after delta and the
- * transfer sizes are meaningful.
+ * transfer sizes are meaningful. `root` serves another tree (a checkout of
+ * an older commit, say) instead of this one, for a before/after pair.
  */
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const { serve } = require('./serve');
 
 const RUNS = Number(process.argv[2]) || 5;
 const LABEL = process.argv[3] || 'run';
 const ROOT = process.argv[4] || '';
 const PORT = 4187;
-const URL = `http://127.0.0.1:${PORT}/`;
 
 const median = (xs) => {
     const s = [...xs].sort((a, b) => a - b);
@@ -28,18 +28,15 @@ async function main() {
     const lighthouse = (await import('lighthouse')).default;
     const chromeLauncher = await import('chrome-launcher');
 
-    const server = spawn(process.execPath, [path.join(__dirname, 'static-server.js')], {
-        env: { ...process.env, PORT: String(PORT), ...(ROOT ? { STATIC_ROOT: ROOT } : {}) },
-        stdio: 'ignore',
-    });
-    await new Promise((r) => setTimeout(r, 1200));
-
-    const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless=new'] });
+    const site = serve(ROOT, PORT);
     const samples = [];
+    let chrome;
 
     try {
+        await site.ready;
+        chrome = await chromeLauncher.launch({ chromeFlags: ['--headless=new'] });
         for (let i = 0; i < RUNS; i += 1) {
-            const result = await lighthouse(URL, {
+            const result = await lighthouse(site.url, {
                 port: chrome.port,
                 output: 'json',
                 logLevel: 'error',
@@ -59,8 +56,8 @@ async function main() {
             process.stderr.write(`  run ${i + 1}/${RUNS} done\n`);
         }
     } finally {
-        await chrome.kill();
-        server.kill();
+        if (chrome) await chrome.kill();
+        site.child.kill();
     }
 
     const keys = Object.keys(samples[0]);

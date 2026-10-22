@@ -19,9 +19,9 @@
  */
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
-const http = require('http');
 const os = require('os');
 const path = require('path');
+const { serve } = require('../serve');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const CONFIG = path.join(ROOT, 'elastishot.config.mjs');
@@ -34,32 +34,6 @@ const at = args.indexOf('--against');
 const ref = at >= 0 && args[at + 1] ? args[at + 1] : 'master';
 
 const git = (...a) => execFileSync('git', a, { cwd: ROOT, encoding: 'utf8' }).trim();
-
-function serve(root, port) {
-    const child = spawn(process.execPath, [path.join(ROOT, 'tests', 'static-server.js')], {
-        env: { ...process.env, STATIC_ROOT: root, PORT: String(port) },
-        stdio: 'ignore',
-    });
-    return { child, url: `http://127.0.0.1:${port}/` };
-}
-
-function waitForServer(url, timeoutMs = 15000) {
-    const started = Date.now();
-    return new Promise((resolve, reject) => {
-        const attempt = () => {
-            http.get(url, (res) => {
-                res.resume();
-                if (res.statusCode === 200) resolve();
-                else retry();
-            }).on('error', retry);
-        };
-        const retry = () => {
-            if (Date.now() - started > timeoutMs) reject(new Error(`no server at ${url} after ${timeoutMs} ms`));
-            else setTimeout(attempt, 200);
-        };
-        attempt();
-    });
-}
 
 function elastishot(cliArgs, env) {
     return new Promise((resolve, reject) => {
@@ -102,8 +76,7 @@ function summarise(runDir) {
     const base = serve(worktree, PORT_BASE);
     const head = serve(ROOT, PORT_HEAD);
     try {
-        await waitForServer(base.url);
-        await waitForServer(head.url);
+        await Promise.all([base.ready, head.ready]);
         console.log(`\n== baseline: ${ref} (${sha}) served from ${worktree}`);
         // The approval pass is only a capture; its run folder would otherwise
         // sit next to the comparison in .elastishot/runs and in the CI artifact.
