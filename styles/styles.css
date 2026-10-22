@@ -116,7 +116,12 @@ header {
   min-height: 100vh;
   color: var(--color-white);
   overflow: hidden;
-  padding: 0 !important;
+}
+
+/* The hero is a .container like every panel, but sits flush to the edges.
+   Two classes outrank the .container padding each breakpoint sets below. */
+.container.header {
+  padding: 0;
 }
 
 section {
@@ -198,7 +203,7 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--box-shadow-1);
   transition: all 0.1s ease-in-out;
 }
 .theme-btn:active {
@@ -415,12 +420,8 @@ section {
 }
 .about-container .left-about p {
   line-height: 2rem;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 0;
   color: var(--color-grey-1);
-}
-.about-container .left-about h3 {
-  font-size: 2rem;
-  text-transform: uppercase;
 }
 
 .about-stats {
@@ -1033,11 +1034,6 @@ section {
 .contact-content-con .left-contact {
   flex: 2;
 }
-.contact-content-con .left-contact h4 {
-  margin-top: 1rem;
-  font-size: 2rem;
-  text-transform: uppercase;
-}
 .contact-content-con .left-contact p {
   margin: 1rem 0;
   line-height: 2rem;
@@ -1048,8 +1044,8 @@ section {
   justify-content: space-between;
 }
 .contact-content-con .left-contact .contact-info .contact-item p {
-  margin: 0.3rem 0 !important;
-  padding: 0 !important;
+  margin: 0.3rem 0;
+  padding: 0;
 }
 .contact-content-con .left-contact .contact-info .contact-item .icon {
   display: grid;
@@ -1120,7 +1116,7 @@ section {
   justify-content: flex-start;
 }
 
-/*Independed components*/
+/*Independent components*/
 .btn-con {
   display: flex;
   align-self: flex-start;
@@ -1170,19 +1166,19 @@ section {
 
 .submit-button {
   background-color: #3171e1; /* AA with white text (4.59:1) */
-  border: none; /* Remove button border */
-  color: white; /* Set button text color */
-  padding: 12px 24px; /* Set padding */
-  text-align: center; /* Center button text */
-  text-decoration: none; /* Remove underline */
-  display: inline-block; /* Display as inline block */
-  font-size: 16px; /* Set font size */
-  margin-top: 10px; /* Add some space above the button */
-  border-radius: 4px; /* Add rounded corners */
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 10px;
+  border-radius: 4px;
 }
 .submit-button:hover {
   background-color: #245fc9; /* darker still on hover */
-  cursor: pointer; /* Change cursor to pointer on hover */
+  cursor: pointer;
 }
 
 #notification-container {
@@ -1239,279 +1235,6 @@ section {
   transform: translate(-50%, -50%);
   font-weight: 800;
   font-size: 6.3rem;
-}
-
-.about-container .left-about p {
-  padding-left: 0;
-}
-
-@media screen and (max-width: 600px) {
-  header {
-    padding: 0 !important;
-  }
-
-  .theme-btn {
-    width: 50px;
-    height: 50px;
-  }
-
-  .header-content {
-    padding-bottom: 6rem;
-  }
-
-  .right-header {
-    padding-right: 0rem !important;
-    width: 90%;
-    margin: 0 auto;
-  }
-  .right-header .name {
-    font-size: 2.5rem !important;
-    text-align: center;
-    padding-top: 3rem;
-  }
-
-  .controls {
-    top: auto;
-    bottom: 0;
-    flex-direction: row;
-    justify-content: center;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    background-color: var(--color-grey-5);
-  }
-  .controls .control {
-    margin: 1rem 0.25rem; /* five 55px tabs at 0.3rem overflow a 320px phone by 3px */
-  }
-
-  .about-container {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  .about-container .right-about {
-    grid-template-columns: repeat(1, 1fr);
-    padding-top: 2.5rem;
-  }
-  .about-container .left-about {
-    padding-right: 0;
-  }
-  .about-container .left-about p {
-    padding-left: 0;
-  }
-
-  .vtl-row {
-    flex-direction: column;
-  }
-  .vtl-card {
-    max-width: 100%;
-  }
-
-  .container {
-    padding: 2rem 2.5rem !important;
-  }
-
-  .about-stats .skills-matrix-grid {
-    grid-template-columns: 1fr;
-  }
-  .about-stats .skills-matrix-table tbody td:first-child {
-    white-space: normal;
-  }
-
-  .core-capabilities {
-    grid-template-columns: 1fr;
-  }
-
-  .certs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .projects-grid {
-    padding-bottom: 6rem; /* clear the fixed bottom tab bar, as .right-contact does */
-  }
-  .project-body {
-    padding: 1.2rem 1rem;
-  }
-  .project-btn .btn-text {
-    padding: 0 1.4rem;
-  }
-
-  .contact-content-con {
-    flex-direction: column;
-  }
-  .contact-content-con .right-contact {
-    margin-left: 0;
-    margin-top: 2.5rem;
-  }
-
-  .contact-content-con .right-contact .i-c-2 {
-    flex-direction: column;
-  }
-
-  .contact-content-con .right-contact .i-c-2 > :last-child {
-    margin-left: 0;
-    margin-top: 1.5rem;
-  }
-
-  .contact-content-con .right-contact {
-    margin-bottom: 6rem;
-  }
-
-  .contact-item {
-    flex-direction: column;
-    margin: 1rem 0;
-  }
-  .contact-item p {
-    font-size: 15px;
-    color: var(--color-grey-2);
-  }
-  .contact-item span {
-    font-size: 15px;
-  }
-  .contact-item .icon {
-    grid-template-columns: 25px 1fr;
-  }
-
-  .main-title h2 {
-    font-size: 2rem;
-  }
-  .main-title h2 span {
-    font-size: 2.3rem;
-  }
-}
-@media screen and (max-width: 1432px) {
-  .container {
-    padding: 7rem 11rem;
-  }
-
-  .contact-content-con {
-    flex-direction: column;
-  }
-  .contact-content-con .right-contact {
-    margin-left: 0;
-    margin-top: 2.5rem;
-  }
-
-  .contact-content-con .right-contact .i-c-2 {
-    flex-direction: column;
-  }
-
-  .contact-content-con .right-contact .i-c-2 > :last-child {
-    margin-left: 0;
-    margin-top: 1.5rem;
-  }
-
-  .contact-content-con .right-contact {
-    margin-bottom: 6rem;
-  }
-
-  .main-title h2 .bg-text {
-    font-size: 5.5rem;
-  }
-}
-@media screen and (max-width: 1250px) {
-  .header-content .right-header {
-    padding-right: 9rem;
-  }
-}
-@media screen and (max-width: 1070px) {
-  .about-container {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  .timeline-board {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  .about-container .right-about {
-    padding-top: 2.5rem;
-  }
-
-  .main-title h2 {
-    font-size: 4rem;
-  }
-  .main-title h2 span {
-    font-size: 4rem;
-  }
-  .main-title h2 .bg-text {
-    font-size: 4.5rem;
-  }
-}
-@media screen and (max-width: 970px) {
-  .container {
-    padding: 7rem 6rem;
-  }
-
-  .about-container .left-about {
-    padding-right: 0rem;
-  }
-
-  .header-content {
-    padding-bottom: 6rem;
-  }
-
-  .right-header {
-    padding-right: 0rem !important;
-    width: 90%;
-    margin: 0 auto;
-  }
-  .right-header .name {
-    font-size: 2.5rem !important;
-    text-align: center;
-    padding-top: 3rem;
-  }
-}
-@media screen and (max-width: 700px) {
-  .container {
-    padding: 7rem 3rem;
-  }
-
-  .about-stats .progress-bars {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
-  .about-container .right-about {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
-  .timeline {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  .timeline-board {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
-  .main-title h2 {
-    font-size: 3rem;
-  }
-  .main-title h2 span {
-    font-size: 3rem;
-  }
-  .main-title h2 .bg-text {
-    font-size: 4rem;
-  }
-}
-
-/* The watermark behind a section title ("Credentials", "Showcase") is wider
-   than a 360px phone at 4rem and pushed the page sideways. This used to sit
-   in the 600px block above, where the later 700px rule silently overrode it. */
-@media screen and (max-width: 600px) {
-  .main-title h2 .bg-text {
-    font-size: 2.3rem;
-  }
-}
-
-/* Five decorative shapes loop forever, and every panel and heading animates
-   in. Honour the OS-level request to stop that. Durations are collapsed
-   rather than the animations removed, so fill-mode:both keyframes still
-   settle on their end state instead of leaving elements invisible. */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 /* ---- Contact form ------------------------------------------------------ */
@@ -1608,4 +1331,178 @@ section {
 
 .skip-link:focus {
   left: 0;
+}
+
+/* ---- Breakpoints ------------------------------------------------------- */
+
+/* Widest first, so a narrower breakpoint always comes later and wins a tie
+   on its own. Keep that order: the 600px block once sat first, every later
+   block silently overrode it, and !important was used to fight back. */
+@media screen and (max-width: 1432px) {
+  .container {
+    padding: 7rem 11rem;
+  }
+
+  .contact-content-con {
+    flex-direction: column;
+  }
+  .contact-content-con .right-contact {
+    margin-left: 0;
+    margin-top: 2.5rem;
+    margin-bottom: 6rem;
+  }
+  .contact-content-con .right-contact .i-c-2 {
+    flex-direction: column;
+  }
+  .contact-content-con .right-contact .i-c-2 > :last-child {
+    margin-left: 0;
+    margin-top: 1.5rem;
+  }
+
+  .main-title h2 .bg-text {
+    font-size: 5.5rem;
+  }
+}
+@media screen and (max-width: 1250px) {
+  .header-content .right-header {
+    padding-right: 9rem;
+  }
+}
+@media screen and (max-width: 1070px) {
+  .about-container .right-about {
+    padding-top: 2.5rem;
+  }
+
+  .main-title h2 .bg-text {
+    font-size: 4.5rem;
+  }
+}
+@media screen and (max-width: 970px) {
+  .container {
+    padding: 7rem 6rem;
+  }
+
+  .about-container .left-about {
+    padding-right: 0;
+  }
+
+  .header-content {
+    padding-bottom: 6rem;
+  }
+  .header-content .right-header {
+    padding-right: 0;
+    width: 90%;
+    margin: 0 auto;
+  }
+  .header-content .right-header .name {
+    font-size: 2.5rem;
+    text-align: center;
+    padding-top: 3rem;
+  }
+}
+@media screen and (max-width: 700px) {
+  .container {
+    padding: 7rem 3rem;
+  }
+
+  .about-container .right-about {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .main-title h2 {
+    font-size: 3rem;
+  }
+  .main-title h2 .bg-text {
+    font-size: 4rem;
+  }
+}
+@media screen and (max-width: 600px) {
+  /* On phones the hero takes the same inset as every other panel. */
+  .container,
+  .container.header {
+    padding: 2rem 2.5rem;
+  }
+
+  .theme-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  .controls {
+    top: auto;
+    bottom: 0;
+    flex-direction: row;
+    justify-content: center;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    background-color: var(--color-grey-5);
+  }
+  .controls .control {
+    margin: 1rem 0.25rem; /* five 55px tabs at 0.3rem overflow a 320px phone by 3px */
+  }
+
+  .vtl-row {
+    flex-direction: column;
+  }
+  .vtl-card {
+    max-width: 100%;
+  }
+
+  .about-stats .skills-matrix-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .core-capabilities {
+    grid-template-columns: 1fr;
+  }
+
+  .certs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .projects-grid {
+    padding-bottom: 6rem; /* clear the fixed bottom tab bar, as .right-contact does */
+  }
+  .project-body {
+    padding: 1.2rem 1rem;
+  }
+  .project-btn .btn-text {
+    padding: 0 1.4rem;
+  }
+
+  .contact-item {
+    flex-direction: column;
+    margin: 1rem 0;
+  }
+  .contact-item p {
+    font-size: 15px;
+    color: var(--color-grey-2);
+  }
+  .contact-item span {
+    font-size: 15px;
+  }
+
+  /* The watermark behind a section title ("Credentials", "Showcase") is
+     wider than a 360px phone at 4rem and pushed the page sideways. */
+  .main-title h2 .bg-text {
+    font-size: 2.3rem;
+  }
+}
+
+/* Five decorative shapes loop forever, and every panel and heading animates
+   in. Honour the OS-level request to stop that. Durations are collapsed
+   rather than the animations removed, so fill-mode:both keyframes still
+   settle on their end state instead of leaving elements invisible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }
