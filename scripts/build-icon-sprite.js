@@ -1,14 +1,24 @@
 /**
- * Builds an inline SVG sprite from the Font Awesome icons index.html uses,
- * and rewrites every <i class="fa..."> into a <use> of that sprite.
+ * Rebuilds the inline SVG icon sprite in index.html from Font Awesome Free.
  *
- *   node scripts/build-icon-sprite.js
+ *   npm run build:icons
  *
- * Why: the FA CDN stylesheet plus its webfonts cost ~134 KiB to render 28
- * icons, and pull in a third party on every visit. The sprite ships the exact
- * paths needed, inline, with no extra request.
+ * The page is the manifest. Every <use href="#i-NAME"> names an icon: this
+ * looks NAME up in Font Awesome's solid set, then its brands set, writes one
+ * <symbol> per icon between the sprite markers, and copies each symbol's
+ * viewBox onto every <svg class="svg-icon"> that uses it. An icon nothing
+ * uses any more drops out. Running it twice changes nothing.
  *
- * Re-run this after adding or removing an icon in index.html. It is a
+ * To add an icon, put this where it should appear, then run the script:
+ *
+ *   <svg class="svg-icon" aria-hidden="true" focusable="false"><use href="#i-NAME"></use></svg>
+ *
+ * NAME is a Font Awesome 5 name, as in
+ * node_modules/@fortawesome/fontawesome-free/svgs/<style>/NAME.svg.
+ *
+ * Why a sprite: the FA CDN stylesheet plus its webfonts cost ~134 KiB to
+ * render 28 icons, and pulled in a third party on every visit. The sprite
+ * ships the exact paths needed, inline, with no extra request. This is a
  * development tool; the site itself has no build step.
  */
 const fs = require('fs');
@@ -16,78 +26,99 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const HTML = path.join(ROOT, 'index.html');
-const FA = path.join(ROOT, 'node_modules', '@fortawesome', 'fontawesome-free', 'svgs');
+const FA = path.join(ROOT, 'node_modules', '@fortawesome', 'fontawesome-free');
 
-const STYLE_DIR = { fas: 'solid', far: 'regular', fab: 'brands' };
+// Searched in this order. No name is in both sets today, so the order only
+// matters if a future Font Awesome release adds one.
+const STYLES = ['solid', 'brands'];
+
 const SPRITE_START = '<!-- ICON SPRITE START -->';
 const SPRITE_END = '<!-- ICON SPRITE END -->';
 
-let html = fs.readFileSync(HTML, 'utf8');
-
-// Drop any previously generated sprite so the script is idempotent.
-const existing = new RegExp(`\\s*${SPRITE_START}[\\s\\S]*?${SPRITE_END}`);
-html = html.replace(existing, '');
-
-// 1. Collect the icons actually referenced.
-const used = new Map();
-for (const m of html.matchAll(/<i class="(fas|far|fab) fa-([a-z0-9-]+)"[^>]*><\/i>/g)) {
-    used.set(`${m[1]}:${m[2]}`, { style: m[1], name: m[2] });
-}
-
-if (used.size === 0) {
-    console.error('No Font Awesome <i> tags found. Already converted?');
+function fail(message) {
+    console.error(message);
     process.exit(1);
 }
 
+if (!fs.existsSync(FA)) {
+    fail('Font Awesome is not installed. Run npm install first.');
+}
+
+const faVersion = JSON.parse(fs.readFileSync(path.join(FA, 'package.json'), 'utf8')).version;
+const original = fs.readFileSync(HTML, 'utf8');
+
+// Keep the file's own line endings: a Windows checkout with core.autocrlf
+// has CRLF, and splicing LF lines into it leaves a mixed file.
+const EOL = original.includes('\r\n') ? '\r\n' : '\n';
+
+// 1. Collect the icons the page references.
+const uses = [...original.matchAll(/<use href="#i-([a-z0-9-]+)">/g)].map((m) => m[1]);
+const names = [...new Set(uses)].sort();
+
+// The references are the whole manifest, so finding none means the page is
+// wrong, not that it has no icons. Never answer that with an empty sprite.
+if (names.length === 0) {
+    fail('No <use href="#i-..."> references in index.html; refusing to write an empty sprite.');
+}
+
 // 2. Pull each icon's viewBox and path data.
-const symbols = [];
 const viewBoxes = new Map();
-for (const { style, name } of [...used.values()].sort((a, b) => a.name.localeCompare(b.name))) {
-    const file = path.join(FA, STYLE_DIR[style], `${name}.svg`);
-    if (!fs.existsSync(file)) {
-        console.error(`MISSING: ${style} fa-${name} -> ${file}`);
-        process.exit(1);
+const symbols = names.map((name) => {
+    const style = STYLES.find((s) => fs.existsSync(path.join(FA, 'svgs', s, `${name}.svg`)));
+    if (!style) {
+        fail(`No Font Awesome icon "${name}" in ${STYLES.join(' or ')} (${path.join(FA, 'svgs')}).`);
     }
-    const svg = fs.readFileSync(file, 'utf8');
+    const svg = fs.readFileSync(path.join(FA, 'svgs', style, `${name}.svg`), 'utf8');
     const viewBox = svg.match(/viewBox="([^"]+)"/)[1];
     const inner = svg
         .replace(/^[\s\S]*?<svg[^>]*>/, '')
         .replace(/<\/svg>\s*$/, '')
         .replace(/<!--[\s\S]*?-->/g, '')
         .trim();
-    symbols.push(`    <symbol id="i-${name}" viewBox="${viewBox}">${inner}</symbol>`);
     viewBoxes.set(name, viewBox);
-}
+    return `    <symbol id="i-${name}" viewBox="${viewBox}">${inner}</symbol>`;
+});
 
-// 3. Emit the sprite, with the attribution CC BY 4.0 requires.
+// 3. Emit the sprite, with the attribution CC BY 4.0 requires, in place of
+//    the old one. A page that has never had one gets it straight after <body>.
 const sprite = [
     SPRITE_START,
-    '<!-- Generated by scripts/build-icon-sprite.js. Do not edit by hand.',
-    '     Icons: Font Awesome Free 5.15.4 (https://fontawesome.com), CC BY 4.0. -->',
+    '<!-- Generated by scripts/build-icon-sprite.js from the <use> references on this page; do not',
+    '     edit by hand. To add an icon, reference it as <use href="#i-NAME"> and run npm run build:icons.',
+    `     Icons: Font Awesome Free ${faVersion} (https://fontawesome.com), CC BY 4.0. -->`,
     '<svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true" focusable="false">',
-    symbols.join('\n'),
+    ...symbols,
     '</svg>',
     SPRITE_END,
-].join('\n');
+].join(EOL);
 
-html = html.replace(/(<body[^>]*>)/, `$1\n${sprite}\n`);
+const existing = new RegExp(`${SPRITE_START}[\\s\\S]*?${SPRITE_END}`);
+let html = existing.test(original)
+    ? original.replace(existing, () => sprite)
+    : original.replace(/<body[^>]*>/, (body) => `${body}${EOL}${sprite}${EOL}`);
 
-// 4. Swap every <i> for a <use> of the sprite, preserving aria-hidden.
-let swapped = 0;
+// 4. Give every icon its symbol's viewBox, so the browser derives the icon's
+//    true width from its aspect ratio. Font Awesome glyphs are not square
+//    (viewBox widths run 320 to 640), and a 512-wide box shrinks a 640-wide
+//    glyph by a fifth.
+let wrapped = 0;
 html = html.replace(
-    /<i class="(?:fas|far|fab) fa-([a-z0-9-]+)"([^>]*)><\/i>/g,
-    (_full, name) => {
-        swapped += 1;
-        // The viewBox travels on the wrapper so the browser can derive each
-        // icon's true width from its aspect ratio. Font Awesome glyphs are not
-        // square (viewBox widths run 320 to 640), and forcing 1em x 1em
-        // visibly squashes the wide ones.
-        return `<svg class="svg-icon" viewBox="${viewBoxes.get(name)}" aria-hidden="true" focusable="false"><use href="#i-${name}"></use></svg>`;
+    /<svg class="svg-icon"([^>]*)><use href="#i-([a-z0-9-]+)"><\/use><\/svg>/g,
+    (_whole, attributes, name) => {
+        wrapped += 1;
+        const rest = attributes.replace(/\s+viewBox="[^"]*"/, '');
+        return `<svg class="svg-icon" viewBox="${viewBoxes.get(name)}"${rest}><use href="#i-${name}"></use></svg>`;
     }
 );
 
-fs.writeFileSync(HTML, html);
+if (wrapped !== uses.length) {
+    console.warn(`${uses.length - wrapped} <use> references are not inside <svg class="svg-icon">; their viewBox was left alone.`);
+}
 
-console.log(`sprite: ${symbols.length} unique icons`);
-console.log(`swapped: ${swapped} <i> tags -> <svg class="svg-icon">`);
+if (html === original) {
+    console.log(`up to date: ${names.length} icons, ${uses.length} uses`);
+} else {
+    fs.writeFileSync(HTML, html);
+    console.log(`wrote index.html: ${names.length} icons, ${uses.length} uses`);
+}
 console.log(`sprite size: ${(Buffer.byteLength(sprite) / 1024).toFixed(1)} KiB inline`);
