@@ -76,7 +76,7 @@ live send was verified once, by hand, with a real browser UA.
 | `responsive.spec.js` | 360 / 768 / 1440 — horizontal scroll and content clipping |
 | `seo.spec.js` | Metadata, Open Graph, JSON-LD, robots, sitemap, favicons |
 | `console.spec.js` | No console errors, no failed requests |
-| `projects.spec.js` | The Projects panel, one card per project (Whetprompt, Elastishot): a versioned release or package URL and new-tab safety for every download button (Whetprompt has three: Windows, macOS on Apple Silicon, macOS on Intel), version / file / hash copies pinned to each other, the note that says what the visitor gets, 360px fit |
+| `projects.spec.js` | The Projects panel, one card per project (Whetprompt, Elastishot): a versioned release or package URL and new-tab safety for every download button (Whetprompt has three: Windows, macOS on Apple Silicon, macOS on Intel), each download's version / file / hash copies pinned to each other (Windows and macOS can be on different releases), the checksum file of every release on the card, the note that says what the visitor gets, 360px fit |
 | `icons.spec.js` | Every icon resolves to a sprite symbol and carries that symbol's `viewBox`; no unused symbols |
 
 Shared constants and helpers (the section list, opening a panel, the axe scan) live in
@@ -145,8 +145,8 @@ form-submission.js          contact form validation and submission
 notification.js             toast notifications (an ARIA live region)
 styles/styles.css           the ONLY stylesheet — see the note below
 fonts/                      Poppins, five weights, latin subset, woff2, self-hosted with its OFL licence
-img/promptfixer.png         the PromptFixer screenshot on the Projects tab (a real local-model run with one
-                            passage of the rewrite kept and one marked for change, made with PromptFixer's
+img/whetprompt.png          the Whetprompt screenshot on the Projects tab (a real local-model run with one
+                            passage of the rewrite kept and one marked for change, made with Whetprompt's
                             scripts/capture-screenshot.mjs; the command is in its header)
 img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
                             made with Elastishot's scripts/capture-portfolio-shot.mjs; the command is in its header)

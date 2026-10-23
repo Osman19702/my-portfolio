@@ -707,8 +707,8 @@
             <div class="projects-grid">
                 <article class="project-card">
                     <figure class="project-media">
-                        <img src="./img/promptfixer.png" width="1200" height="750" loading="lazy" decoding="async"
-                             alt="PromptFixer window, version 0.4.0 beside the name and a 'What's new' link at the right end of the top bar, beside Library. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues, rewritten by the built-in Qwen3 4B model on the GPU. Right: a row reporting 2.3 GB of models on disk, 338.6 GB free and the model loaded in memory, with buttons to release it or delete it; below that the rewrite scored 93, up 51, with a summary of what changed and per-category bars for clarity, specificity, context, format and structure. Under them a marking bar offers 'Keep it &mdash; I loved it' and 'Change it &mdash; I didn't like it', counts 1 kept and 1 to change, and has a 'Fix again with my marks' button. In the rewritten prompt, the sentence that names the audience and asks for bullet points is highlighted green as kept, and the sentence that caps the length at 200 words is highlighted red, to be changed.">
+                        <img src="./img/whetprompt.png" width="1200" height="750" loading="lazy" decoding="async"
+                             alt="Whetprompt window, version 0.5.0 beside the name and a 'What's new' link at the right end of the top bar, beside Library. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues, rewritten by the built-in Qwen3 4B model on the GPU. Right: the rewrite scored 93, up 51, with a summary of what changed and per-category bars for clarity, specificity, context, format and structure. Under them a marking bar offers 'Keep it &mdash; I loved it' and 'Change it &mdash; I didn't like it', counts 1 kept and 1 to change, and has a 'Fix again with my marks' button. In the rewritten prompt, the sentence that names the audience and asks for bullet points is highlighted green as kept, and the sentence that caps the length at 200 words is highlighted red, to be changed.">
                     </figure>
                     <div class="project-body">
                         <div class="project-info">
@@ -721,7 +721,7 @@
                             </div>
                             <p class="project-desc">
                                 Lint, score and rewrite LLM prompts. A desktop app for Windows and macOS with a built-in local model; cloud providers optional.
-                                Formerly PromptFixer: the 0.4.0 downloads below still carry that name.
+                                Formerly PromptFixer, renamed in 0.5.0.
                             </p>
                             <p class="project-desc">
                                 I built it with Claude Code, for personal use: fixing a prompt before I send it means fewer wasted tokens and a better first answer.
@@ -731,14 +731,15 @@
                                 <li>Rewrites it with a local model (Qwen3-4B via node-llama-cpp). Runs offline; nothing you type leaves the machine.</li>
                                 <li>Re-scores the rewrite and shows a word-level diff with a change log for every edit.</li>
                                 <li>Select any passage of the rewrite, mark it <em>Keep it</em> or <em>Change it</em>, and fix again. The model revises its own rewrite instead of starting over, and a guard checks that what you kept came back word for word.</li>
-                                <li>The rewrite appears as the model writes it instead of a spinner, a line names which wait you are in, and the model hands its memory back when it sits idle. &ldquo;Nothing you type leaves the machine&rdquo; stopped being a claim and became a test that fails the build if the app opens a connection to anything but this machine.</li>
-                                <li>New in 0.4.0: a website with the latest download, its checksum and the notes of every release, rebuilt from the release itself whenever one is published; the app&rsquo;s top bar links to it. A link, not an update check: the app never fetches the site, and that test still runs on every push.</li>
+                                <li>The rewrite appears as the model writes it instead of a spinner, and a line names which wait you are in. &ldquo;Nothing you type leaves the machine&rdquo; stopped being a claim and became a test that fails the build if the app opens a connection to anything but this machine.</li>
+                                <li>A website with the latest download, its checksum and the notes of every release, rebuilt from the release itself whenever one is published; the app&rsquo;s top bar links to it. A link, not an update check: the app never fetches the site, and that test still runs on every push.</li>
                                 <li>Since October 2026 also for macOS: disk images for Apple Silicon, where the model runs on the GPU through Metal, and for Intel Macs, built from the same 0.4.0 sources and attached to the same release.</li>
+                                <li>New in 0.5.0, besides the name: on a freshly installed Windows the local model would not start, and all it said was an error class name. Its llama.cpp binaries need Microsoft&rsquo;s C++ runtime, which a new Windows does not have; the installer now carries its own copy, a build that cannot find one fails instead of shipping, and a model that still cannot start says why. The model also stays loaded between fixes again, so only the first one waits for it.</li>
                             </ul>
                             <div class="project-stack">
                                 <span>Electron</span><span>React</span><span>TypeScript</span><span>Vite</span><span>Node.js / Express</span><span>node-llama-cpp</span><span>Playwright</span><span>Elastishot</span>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 114 Gherkin scenarios, 104 of them automated with Playwright, plus 308 unit and component tests. The interface is checked against approved screenshots with Elastishot.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 114 Gherkin scenarios, 104 of them automated with Playwright, plus 348 unit and component tests. The interface is checked against approved screenshots with Elastishot.</p>
                             <p class="project-links">
                                 <a href="https://osman19702.github.io/Whetprompt/" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-globe"></use></svg> Website</a>
                                 <a href="https://github.com/Osman19702/Whetprompt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
@@ -748,28 +749,32 @@
                         <div class="project-download">
                             <h4>Download for Windows</h4>
                             <div class="btn-con">
-                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.4.0/PromptFixer-0.4.0-win-x64.exe"
+                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.5.0/Whetprompt-0.5.0-win-x64.exe"
                                    class="main-btn project-btn" data-download="win-x64" target="_blank" rel="noopener noreferrer" aria-describedby="whetprompt-note">
-                                    <span class="btn-text">Download<span class="sr-only"> PromptFixer for Windows</span></span>
+                                    <span class="btn-text">Download<span class="sr-only"> Whetprompt for Windows</span></span>
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg></span>
                                 </a>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.4.0</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="win-x64">0.5.0</span></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-windows"></use></svg> Windows 10 / 11, 64-bit</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 339 MiB installer (355,615,264 bytes). The 2.5 GB language model downloads on first run; after that it works offline.</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-27">27 Sep 2026</time></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 339.8 MiB installer (356,320,325 bytes). The 2.5 GB language model downloads on first run; after that it works offline.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-10-23">23 Oct 2026</time></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-sync-alt"></use></svg> Installed over PromptFixer, it replaces it and keeps its library and downloaded model.</p>
 
                             <p class="project-hash" data-download="win-x64">
                                 <span class="project-hash-label">SHA-256, Windows</span>
-                                <code>A8748C36186D3B4FF0D16E81AB7E4044AB481CAAB1ADA5FF547685893B1FF566</code>
+                                <code>D420EA0F63CFD623265287DCA0D025B8F9F76D9EB22FBF591D60371BEA5D7B12</code>
                             </p>
                             <p class="project-verify-label">Verify the file you downloaded (PowerShell):</p>
-                            <pre class="project-verify"><code>Get-FileHash .\PromptFixer-0.4.0-win-x64.exe -Algorithm SHA256</code></pre>
+                            <pre class="project-verify"><code>Get-FileHash .\Whetprompt-0.5.0-win-x64.exe -Algorithm SHA256</code></pre>
 
                             <p class="info-stats project-note" id="whetprompt-note">
                                 <strong>Unsigned installer.</strong> I have not bought a code-signing certificate, so on first run Windows SmartScreen shows
                                 &ldquo;Windows protected your PC&rdquo;. Click <em>More info</em>, then <em>Run anyway</em> &mdash; but only after the SHA-256
                                 above matches the file you downloaded. The checksum proves the file is the one I built; it does not mean Windows vouches for it.
+                            </p>
+                            <p class="project-links">
+                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.5.0/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums for 0.5.0 (SHA256SUMS.txt)</a>
                             </p>
 
                             <h4 class="project-subhead">Download for macOS</h4>
@@ -786,6 +791,7 @@
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg></span>
                                 </a>
                             </div>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="mac-arm64 mac-x64">0.4.0</span>, from before the rename, so the images and the app are called PromptFixer. There is no macOS build of 0.5.0 yet.</p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 138.9 MiB Apple Silicon image (145,626,827 bytes); 144.1 MiB Intel image (151,112,911 bytes). The same 2.5 GB model downloads on first run; on Apple Silicon it runs on the GPU through Metal, on an Intel Mac on the CPU.</p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Added to the 0.4.0 release on <time datetime="2026-10-16">16 Oct 2026</time></p>
 
@@ -808,7 +814,7 @@ shasum -a 256 ~/Downloads/PromptFixer-0.4.0-mac-x64.dmg</code></pre>
                                 press <em>Open Anyway</em> &mdash; once, and only after the SHA-256 above matches the file you downloaded.
                             </p>
                             <p class="project-links">
-                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.4.0/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS.txt)</a>
+                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.4.0/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums for 0.4.0 (SHA256SUMS.txt)</a>
                             </p>
                         </div>
                     </div>
@@ -858,7 +864,7 @@ shasum -a 256 ~/Downloads/PromptFixer-0.4.0-mac-x64.dmg</code></pre>
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg></span>
                                 </a>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version">0.2.0</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="npm">0.2.0</span></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 640 512" aria-hidden="true" focusable="false"><use href="#i-cogs"></use></svg> Node.js 20 or newer; Playwright's Chromium only for page captures</p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 174 KiB package (178,401 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-20">20 Sep 2026</time></p>

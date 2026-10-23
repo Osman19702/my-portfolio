@@ -23,9 +23,11 @@ const GATEKEEPER = [/not notarized/i, /Privacy & Security/, /Open Anyway/];
 
 // One entry per card, in the order the cards appear. `downloads` is one entry
 // per button, keyed by its data-download attribute, which also keys the hash
-// shown for that file; `asset` captures the version from the link, and `note`
-// is what the sentence the button is described by must say. `sums` is where
-// the card's checksum file must be.
+// shown for that file and is listed on the version shown for it; `asset`
+// captures the version from the link, and `note` is what the sentence the
+// button is described by must say. `sums` maps a download to the checksum file
+// of its release: downloads can come from different releases, and the card
+// links the checksum file of each one.
 const PROJECTS = [
     {
         name: 'Whetprompt',
@@ -60,6 +62,8 @@ async function openProjects(page) {
 const cardOf = (page, i) => page.locator('#projects .project-card').nth(i);
 const buttonOf = (card, download) => card.locator(`a.project-btn[data-download="${download.key}"]`);
 const hashOf = (card, download) => card.locator(`.project-hash[data-download="${download.key}"]`);
+// One version can cover several files (both macOS images), so its data-download is a list.
+const versionOf = (card, download) => card.locator(`.project-version[data-download~="${download.key}"]`);
 
 test.describe('Projects panel', () => {
     test('the projects tab reveals the panel and nothing else', async ({ page }) => {
@@ -111,10 +115,18 @@ test.describe('Projects panel', () => {
             test('every copy of the version agrees: tag, file name, version shown, verify command', async ({ page }) => {
                 await openProjects(page);
                 const card = cardOf(page, i);
-                const shown = (await card.locator('.project-version').textContent()).trim();
-                expect(shown).toMatch(/^\d+\.\d+\.\d+$/);
+                // A version that names no download on the card is one nothing here checks.
+                const keys = project.downloads.map((d) => d.key);
+                const covered = await card.locator('.project-version').evaluateAll((els) => els.map((el) => el.dataset.download || ''));
+                for (const listed of covered) {
+                    for (const key of listed.trim().split(/\s+/)) expect(keys, `a version shown for "${listed}"`).toContain(key);
+                }
                 const verify = (await card.locator('.project-verify').allTextContents()).join('\n');
                 for (const download of project.downloads) {
+                    const version = versionOf(card, download);
+                    await expect(version, `${download.key}: one version shown`).toHaveCount(1);
+                    const shown = (await version.textContent()).trim();
+                    expect(shown, download.key).toMatch(/^\d+\.\d+\.\d+$/);
                     const href = await buttonOf(card, download).getAttribute('href');
                     const m = href.match(download.asset);
                     if (m && m[1]) {
@@ -142,28 +154,29 @@ test.describe('Projects panel', () => {
                 expect(new Set(digests.map((d) => d.trim().toLowerCase())).size).toBe(digests.length);
             });
 
-            test('the checksum file lives in the release the version points at', async ({ page }) => {
+            test('every release a download comes from has its checksum file linked, once', async ({ page }) => {
                 await openProjects(page);
                 const card = cardOf(page, i);
                 const sums = card.locator('a[href*="SHA256SUMS"]');
-                await expect(sums).toHaveCount(1);
-                const href = await sums.getAttribute('href');
-                const primary = await buttonOf(card, project.downloads[0]).getAttribute('href');
-                const expected = project.sums(primary);
-                if (expected) {
-                    expect(href).toBe(expected);
-                    // Every file on the card is in the same release as its checksum file.
-                    for (const download of project.downloads) {
-                        const other = await buttonOf(card, download).getAttribute('href');
-                        expect(project.sums(other), `${download.key} is in another release`).toBe(expected);
-                    }
-                } else {
-                    expect(href).toMatch(project.sumsPattern);
-                    const version = (await card.locator('.project-version').textContent()).trim();
-                    expect(href.match(project.sumsPattern)[1], 'checksums belong to another version').toBe(version);
+                const hrefs = await sums.evaluateAll((els) => els.map((el) => el.getAttribute('href')));
+                const expected = new Set();
+                for (const download of project.downloads) {
+                    const expectedSums = project.sums(await buttonOf(card, download).getAttribute('href'));
+                    if (expectedSums) expected.add(expectedSums);
                 }
-                await expect(sums).toHaveAttribute('target', '_blank');
-                await expect(sums).toHaveAttribute('rel', /\bnoopener\b/);
+                if (expected.size) {
+                    // No release without its checksum file, and none linked that no download is in.
+                    expect(hrefs.sort()).toEqual([...expected].sort());
+                } else {
+                    expect(hrefs).toHaveLength(1);
+                    expect(hrefs[0]).toMatch(project.sumsPattern);
+                    const version = (await versionOf(card, project.downloads[0]).textContent()).trim();
+                    expect(hrefs[0].match(project.sumsPattern)[1], 'checksums belong to another version').toBe(version);
+                }
+                for (const link of await sums.all()) {
+                    await expect(link).toHaveAttribute('target', '_blank');
+                    await expect(link).toHaveAttribute('rel', /\bnoopener\b/);
+                }
             });
 
             test('the source link points at the repository the release belongs to', async ({ page }) => {
