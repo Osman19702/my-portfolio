@@ -76,7 +76,7 @@ live send was verified once, by hand, with a real browser UA.
 | `responsive.spec.js` | 360 / 768 / 1440 — horizontal scroll and content clipping |
 | `seo.spec.js` | Metadata, Open Graph, JSON-LD, robots, sitemap, favicons |
 | `console.spec.js` | No console errors, no failed requests |
-| `projects.spec.js` | The Projects panel, one card per project (PromptFixer, Elastishot): a versioned release or package URL and new-tab safety for every download button (PromptFixer has three: Windows, macOS on Apple Silicon, macOS on Intel), version / file / hash copies pinned to each other, the note that says what the visitor gets, 360px fit |
+| `projects.spec.js` | The Projects panel, one card per project (Whetprompt, Elastishot): a versioned release or package URL and new-tab safety for every download button (Whetprompt has three: Windows, macOS on Apple Silicon, macOS on Intel), version / file / hash copies pinned to each other, the note that says what the visitor gets, 360px fit |
 | `icons.spec.js` | Every icon resolves to a sprite symbol and carries that symbol's `viewBox`; no unused symbols |
 
 Shared constants and helpers (the section list, opening a panel, the axe scan) live in

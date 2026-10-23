@@ -3,7 +3,7 @@ const { openPanel } = require('./helpers');
 
 /**
  * The Projects panel is the one place on the site that hands a visitor
- * something to run: installers and disk images for PromptFixer, an npm
+ * something to run: installers and disk images for Whetprompt, an npm
  * package for Elastishot. What makes that safe to accept - a versioned URL on
  * a host they can inspect, a checksum to compare, a plain statement of what
  * the file is and is not - is all content, and content drifts. These tests
@@ -15,8 +15,9 @@ const { openPanel } = require('./helpers');
 
 const SHA256 = /^[0-9A-F]{64}$/i;
 
-const PROMPTFIXER_ASSET = (file) =>
-    new RegExp(`^https://github\\.com/Osman19702/PromptFixer/releases/download/v(\\d+\\.\\d+\\.\\d+)/(PromptFixer-(\\d+\\.\\d+\\.\\d+)-${file})$`);
+// Releases up to 0.4.0 were published as PromptFixer, and their files keep that name.
+const WHETPROMPT_ASSET = (file) =>
+    new RegExp(`^https://github\\.com/Osman19702/Whetprompt/releases/download/v(\\d+\\.\\d+\\.\\d+)/((?:Whetprompt|PromptFixer)-(\\d+\\.\\d+\\.\\d+)-${file})$`);
 
 const GATEKEEPER = [/not notarized/i, /Privacy & Security/, /Open Anyway/];
 
@@ -27,13 +28,13 @@ const GATEKEEPER = [/not notarized/i, /Privacy & Security/, /Open Anyway/];
 // the card's checksum file must be.
 const PROJECTS = [
     {
-        name: 'PromptFixer',
-        repo: 'https://github.com/Osman19702/PromptFixer',
+        name: 'Whetprompt',
+        repo: 'https://github.com/Osman19702/Whetprompt',
         stack: ['Electron', 'React', 'TypeScript', 'Playwright'],
         downloads: [
-            { key: 'win-x64', asset: PROMPTFIXER_ASSET('win-x64\\.exe'), note: [/not code-signed|unsigned/i, /SmartScreen/, /Run anyway/] },
-            { key: 'mac-arm64', asset: PROMPTFIXER_ASSET('mac-arm64\\.dmg'), note: GATEKEEPER },
-            { key: 'mac-x64', asset: PROMPTFIXER_ASSET('mac-x64\\.dmg'), note: GATEKEEPER },
+            { key: 'win-x64', asset: WHETPROMPT_ASSET('win-x64\\.exe'), note: [/not code-signed|unsigned/i, /SmartScreen/, /Run anyway/] },
+            { key: 'mac-arm64', asset: WHETPROMPT_ASSET('mac-arm64\\.dmg'), note: GATEKEEPER },
+            { key: 'mac-x64', asset: WHETPROMPT_ASSET('mac-x64\\.dmg'), note: GATEKEEPER },
         ],
         sums: (href) => href.replace(/\/[^/]+$/, '/SHA256SUMS.txt'),
         verifyMentions: (file) => file,
