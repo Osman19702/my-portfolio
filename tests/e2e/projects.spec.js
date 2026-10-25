@@ -84,6 +84,34 @@ test.describe('Projects panel', () => {
         await expect(page.locator('#projects .project-card h3')).toHaveText(PROJECTS.map((p) => p.name));
     });
 
+    // Microsoft's own badge, but served by this site: the page loads nothing from another origin
+    // (links.spec.js checks the CSP), so the badge is two images, one per theme.
+    test('the Microsoft Store badge links to the listing, opens safely and suits the theme', async ({ page }) => {
+        await openProjects(page);
+        const badge = cardOf(page, 0).locator('a.store-badge');
+        await expect(badge).toHaveCount(1);
+        await expect(badge).toHaveAttribute('href', 'https://apps.microsoft.com/detail/9P750H35HR59');
+        await expect(badge).toHaveAttribute('target', '_blank');
+        await expect(badge).toHaveAttribute('rel', /\bnoopener\b/);
+        await expect(badge).toHaveAttribute('rel', /\bnoreferrer\b/);
+        const dark = badge.locator('img.store-badge-dark');
+        const light = badge.locator('img.store-badge-light');
+        for (const img of [dark, light]) {
+            expect(new URL(await img.getAttribute('src'), page.url()).origin, 'served by this site').toBe(new URL(page.url()).origin);
+            await expect(img).toHaveAttribute('alt', /Microsoft Store/);
+        }
+        await badge.scrollIntoViewIfNeeded();
+        await expect(dark).toBeVisible();
+        await expect(light).toBeHidden();
+        await expect.poll(() => dark.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+
+        await page.locator('.theme-btn').click();
+        await expect(page.locator('html')).toHaveClass(/light-mode/);
+        await expect(light).toBeVisible();
+        await expect(dark).toBeHidden();
+        await expect.poll(() => light.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+    });
+
     for (const [i, project] of PROJECTS.entries()) {
         test.describe(project.name, () => {
             test('names the project and the stack it is built on', async ({ page }) => {

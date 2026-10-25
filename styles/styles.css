@@ -929,6 +929,34 @@ section {
 .project-download .btn-con {
   margin-bottom: 1rem;
 }
+/* The "Download from the Microsoft Store" badge on the Whetprompt card: Microsoft's own artwork, the dark
+   and the light version, kept in img/ because the page loads nothing from another origin (see
+   the CSP). The one for the current theme shows, as Microsoft's badge script would pick it; the
+   other is display: none, so it is neither drawn, fetched (it is lazy) nor read out. */
+.project-store {
+  margin-bottom: 0.2rem;
+}
+.store-badge {
+  display: inline-block;
+  line-height: 0;
+  border-radius: 6px;
+}
+.store-badge img {
+  width: 200px;
+  max-width: 100%;
+  height: auto;
+}
+.store-badge-light,
+.light-mode .store-badge-dark {
+  display: none;
+}
+.light-mode .store-badge-light {
+  display: inline;
+}
+.store-badge:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 3px;
+}
 /* The two macOS buttons sit beside each other where the column is wide enough and wrap under each other where it is not. */
 .project-download .project-btn-row {
   flex-wrap: wrap;
