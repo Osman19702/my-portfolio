@@ -897,8 +897,10 @@ Get-FileHash .\elastishot-0.2.0.tgz -Algorithm SHA256</code></pre>
                             </p>
 
                             <h4 class="project-subhead">Install as a Claude Code plugin</h4>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tools"></use></svg> Elastishot is also a Claude Code plugin, from my own marketplace repo. It adds two skills, elastishot:compare-screenshots and elastishot:visual-baselines, which run the same CLI through npx, so there is no elastishot dependency to add — page captures still need Playwright's Chromium, exactly as above.</p>
-                            <p class="project-command-label">Add the marketplace, then install (in Claude Code):</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tools"></use></svg> Elastishot is also a Claude Code plugin, listed in the Claude plugin directory. It adds two skills, elastishot:compare-screenshots and elastishot:visual-baselines, which run the same CLI through npx, so there is no elastishot dependency to add — page captures still need Playwright's Chromium, exactly as above.</p>
+                            <p class="project-command-label">Find it under Customize → Plugins → Discover on claude.ai, or browse the directory in Claude Code:</p>
+                            <pre class="project-command"><code>/plugin directory</code></pre>
+                            <p class="project-command-label">Or add my marketplace, then install (in Claude Code):</p>
                             <pre class="project-command"><code>/plugin marketplace add Osman19702/claude-plugins</code></pre>
                             <pre class="project-command"><code>/plugin install elastishot@osman-plugins</code></pre>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-sync-alt"></use></svg> Then restart Claude Code, or run <code>/reload-plugins</code>, before the two skills appear.</p>
