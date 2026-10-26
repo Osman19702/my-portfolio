@@ -1,12 +1,12 @@
-// Visual regression targets for osmanturalioglu.com, run by tests/visual/run.js.
+// Visual check for osmanturalioglu.com. `npm run visual` runs `elastishot pr`:
+// it checks the reference out into a temporary worktree, serves it and the
+// working tree side by side, and compares every target. The site is static, so
+// each side's folder is served as it is and there is no `pr` block.
 //
 // The site is a tab SPA: only the active section is in the layout, so every
 // section is its own target and is opened by clicking its tab before the
 // capture. Two colour schemes and two widths cover what the e2e suite checks
 // by hand (360 px fit, both themes).
-const PORT = process.env.VISUAL_PORT ?? '4174'
-const BASE = `http://127.0.0.1:${PORT}/`
-
 const SECTIONS = ['home', 'about', 'certifications', 'projects', 'contact']
 const THEMES = ['dark', 'light']
 
@@ -22,7 +22,6 @@ const openTab = (id) => async (page) => {
 }
 
 export default {
-  baselineDir: process.env.VISUAL_BASELINES ?? 'tests/visual/baselines',
   outDir: '.elastishot/runs',
   threshold: 0.98,
   viewports: [
@@ -34,7 +33,7 @@ export default {
   targets: SECTIONS.flatMap((id) =>
     THEMES.map((theme) => ({
       name: `${id}-${theme}`,
-      url: BASE,
+      url: '/',
       capture: { colorScheme: theme, waitFor: openTab(id) },
     })),
   ),

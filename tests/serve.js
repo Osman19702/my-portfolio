@@ -1,6 +1,6 @@
 /**
  * Starts tests/static-server.js for a script that needs a site to point a
- * browser at (tests/visual/run.js, tests/lighthouse.js).
+ * browser at (tests/lighthouse.js).
  *
  *   const site = serve(root, port);
  *   await site.ready;   // site.url is now answering
@@ -9,8 +9,8 @@
  *
  * `ready` resolves on the server's own "listening" line rather than on the
  * port answering. Polling the port cannot tell this server from a stale one
- * left on it by an earlier run, and a before/after comparison against the
- * wrong tree looks exactly like a clean result. If the port is taken, the
+ * left on it by an earlier run, and a measurement of the wrong tree looks
+ * exactly like a real one. If the port is taken, the
  * server exits and `ready` rejects instead.
  */
 const { spawn } = require('child_process');
