@@ -848,18 +848,18 @@ shasum -a 256 ~/Downloads/PromptFixer-0.4.0-mac-x64.dmg</code></pre>
                                 Visual comparison for web UIs. It lines two screenshots up before it diffs them, so a banner or a collapsed section is one change instead of a page of red, and it names the DOM element behind every region.
                             </p>
                             <p class="project-desc">
-                                I built it with Claude Code after one pixel-diff run too many that flagged everything. This site now runs it before every release (<code>npm run visual</code>, every section, both themes, two widths).
+                                I built it with Claude Code after one pixel-diff run too many that flagged everything. This site runs it on every pull request, through its GitHub Action, and before every release (<code>npm run visual</code>: every section, both themes, two widths).
                             </p>
                             <ul class="project-points">
                                 <li>Feature alignment (ORB + RANSAC) recovers zoom, crop and shift; same-size captures are then aligned row by row, and side-by-side columns that move on their own get their own lanes, so a section that grew, collapsed or moved is one change, not a page of them.</li>
                                 <li>Regions are added, removed, changed or moved, each attributed to a test id, role or CSS path from an element map recorded at capture time.</li>
                                 <li>HTML report with a slider, flip, blink, overlay and diff viewer that keeps both sides lined up below an inserted or removed section, plus JSON, JUnit and exit codes for CI. Open source, MIT, no telemetry.</li>
-                                <li>New in 0.2.0: a card whose picture is redrawn while its two columns grow by different amounts is reported column by column. That case used to come out as stripes of added and removed rows straight across the card, with text that had only moved marked as changed.</li>
+                                <li>New in 0.3.0: <code>elastishot pr</code> checks a branch against its base with no baselines to commit. It checks the base out into a temporary worktree, builds and serves both sides, and captures them in one run with one browser, so fonts and the browser build cannot differ.</li>
                             </ul>
                             <div class="project-stack">
                                 <span>TypeScript</span><span>Node.js</span><span>opencv.js (WASM)</span><span>Playwright</span><span>Web Components</span><span>node:test</span>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 30 Gherkin scenarios driving the built CLI, plus 224 unit, engine and browser tests. On its ground-truth lab: 43 of 43 planted changes found, 1 false positive.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 38 Gherkin scenarios driving the built CLI, plus 270 unit, engine and browser tests. On its ground-truth lab: 43 of 43 planted changes found, 1 false positive.</p>
                             <p class="project-links">
                                 <a href="https://github.com/Osman19702/elastishot" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
                             </p>
@@ -874,18 +874,18 @@ shasum -a 256 ~/Downloads/PromptFixer-0.4.0-mac-x64.dmg</code></pre>
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg></span>
                                 </a>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="npm">0.2.0</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="npm">0.3.0</span></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 640 512" aria-hidden="true" focusable="false"><use href="#i-cogs"></use></svg> Node.js 20 or newer; Playwright's Chromium only for page captures</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 174 KiB package (178,401 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-09-20">20 Sep 2026</time></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 205 KiB package (209,926 bytes). The 13 MB opencv.js WebAssembly build installs as a dependency; no native compile step.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-10-26">26 Oct 2026</time></p>
 
                             <p class="project-hash" data-download="npm">
                                 <span class="project-hash-label">SHA-256</span>
-                                <code>26B3928A60EF5087910A1885F56B2BFBE04D4FD4DFCF87A7878DBE03C949A124</code>
+                                <code>177E5D1EFBF4564B3C0563C5195A1857F0C8DB756C1AA2601E6B070A92D5B653</code>
                             </p>
                             <p class="project-verify-label">Verify the tarball npm serves (PowerShell):</p>
-                            <pre class="project-verify"><code>npm pack elastishot@0.2.0
-Get-FileHash .\elastishot-0.2.0.tgz -Algorithm SHA256</code></pre>
+                            <pre class="project-verify"><code>npm pack elastishot@0.3.0
+Get-FileHash .\elastishot-0.3.0.tgz -Algorithm SHA256</code></pre>
 
                             <p class="info-stats project-note" id="elastishot-note">
                                 <strong>Install with</strong> <code>npm install -D elastishot</code>. The digest above is the registry tarball's, and the GitHub release
@@ -893,17 +893,25 @@ Get-FileHash .\elastishot-0.2.0.tgz -Algorithm SHA256</code></pre>
                                 so the package page shows which commit and workflow built it.
                             </p>
                             <p class="project-links">
-                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.2.0/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
+                                <a href="https://github.com/Osman19702/elastishot/releases/download/v0.3.0/SHA256SUMS" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums (SHA256SUMS)</a>
+                            </p>
+
+                            <h4 class="project-subhead">Check pull requests with the GitHub Action</h4>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> The Elastishot visual check action runs <code>elastishot pr</code> in the pull request's own job. The job summary lists the pages that changed and the element behind each change, and the full report is uploaded with the run. This site's pull requests use it.</p>
+                            <p class="project-command-label">Add it after <code>actions/checkout</code> (with <code>fetch-depth: 2</code>) and <code>npm ci</code>:</p>
+                            <pre class="project-command"><code>- uses: Osman19702/elastishot-action@v0.3</code></pre>
+                            <p class="project-links">
+                                <a href="https://github.com/marketplace/actions/elastishot-visual-check" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Elastishot visual check on the GitHub Marketplace</a>
                             </p>
 
                             <h4 class="project-subhead">Install as a Claude Code plugin</h4>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tools"></use></svg> Elastishot is also a Claude Code plugin, listed in the Claude plugin directory. It adds two skills, elastishot:compare-screenshots and elastishot:visual-baselines, which run the same CLI through npx, so there is no elastishot dependency to add — page captures still need Playwright's Chromium, exactly as above.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tools"></use></svg> Elastishot is also a Claude Code plugin, listed in the Claude plugin directory. It adds three skills, elastishot:pr-visual-check, elastishot:compare-screenshots and elastishot:visual-baselines, which run the same CLI through npx, so there is no elastishot dependency to add — page captures still need Playwright's Chromium, exactly as above.</p>
                             <p class="project-command-label">Find it under Customize → Plugins → Discover on claude.ai, or browse the directory in Claude Code:</p>
                             <pre class="project-command"><code>/plugin directory</code></pre>
                             <p class="project-command-label">Or add my marketplace, then install (in Claude Code):</p>
                             <pre class="project-command"><code>/plugin marketplace add Osman19702/claude-plugins</code></pre>
                             <pre class="project-command"><code>/plugin install elastishot@osman-plugins</code></pre>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-sync-alt"></use></svg> Then restart Claude Code, or run <code>/reload-plugins</code>, before the two skills appear.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-sync-alt"></use></svg> Then restart Claude Code, or run <code>/reload-plugins</code>, before the three skills appear.</p>
                             <p class="project-links">
                                 <a href="https://github.com/Osman19702/claude-plugins" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Marketplace repo (osman-plugins)</a>
                             </p>
