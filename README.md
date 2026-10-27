@@ -85,12 +85,12 @@ Shared constants and helpers (the section list, opening a panel, the axe scan) l
 ### Visual check before a release
 
 ```bash
-npm run visual                        # working tree vs master, i.e. what is deployed
-npm run visual -- --against v2026.09  # vs any tag, branch or commit
-npm run visual:report                 # open the last report
+npm run visual                       # working tree vs where this branch left origin/master
+npm run visual -- --base v2026.09    # vs any tag, branch or commit
+npm run visual:report                # open the last report
 ```
 
-`tests/visual/run.js` drives [Elastishot](https://github.com/Osman19702/elastishot),
+`npm run visual` is `elastishot pr`, from [Elastishot](https://github.com/Osman19702/elastishot):
 a screenshot comparison that aligns the two captures first and names the element
 behind every change. It checks out the reference into a temporary worktree, serves it
 and the working tree on two ports, and captures every section in both themes at 1440
@@ -98,9 +98,11 @@ and 360 px (20 pairs, `elastishot.config.mjs`). Both sides are captured on the s
 machine in the same run, so fonts and Chromium cancel out and nothing has to be
 committed as a baseline. Exit code 1 means differences; the report in
 `.elastishot/runs/latest/index.html` shows them with a slider and the locators.
-The same script runs on every pull request in CI against the target branch and
-uploads its report as the `elastishot-report` artifact. Elastishot comes from npm
-(`elastishot@^0.2.0`, a devDependency).
+On every pull request, CI runs the same check against the target branch with the
+[Elastishot visual check](https://github.com/marketplace/actions/elastishot-visual-check)
+action: the table of changed elements goes to the job summary, and the report is
+uploaded as the `elastishot-report` artifact. Elastishot comes from npm
+(`elastishot@^0.3.0`, a devDependency).
 
 ### Expected failures
 
@@ -155,9 +157,9 @@ img/elastishot.png          the Elastishot screenshot on the Projects tab (a rea
 scripts/build-icon-sprite.js  regenerates the sprite from Font Awesome
 tests/e2e/                  Playwright specs, plus helpers.js shared between them
 tests/static-server.js      zero-dependency static server for local and CI runs
-tests/serve.js              starts that server for the scripts below and waits until it is listening
+tests/serve.js              starts that server for the script below and waits until it is listening
 tests/lighthouse.js         repeatable performance measurement
-tests/visual/run.js         visual check against a git ref, driving Elastishot (elastishot.config.mjs)
+elastishot.config.mjs       the visual check's targets: every section, both themes, two widths
 docs/MASTER_PROMPT.md       working notes, constraints and the defect backlog
 .github/workflows/ci.yml    runs the suite on push and PR
 ```

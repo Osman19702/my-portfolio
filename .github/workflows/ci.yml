@@ -46,9 +46,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The baseline is a worktree of the target branch, captured in this
-          # same job so fonts and Chromium match the candidate exactly.
-          fetch-depth: 0
+          # The base is the first parent of the merge commit the checkout
+          # makes. It is captured in this same job, so fonts and Chromium
+          # match the pull request's side exactly.
+          fetch-depth: 2
 
       - uses: actions/setup-node@v4
         with:
@@ -58,20 +59,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-
+      # Runs `elastishot pr` with the elastishot in package-lock.json and
+      # installs its Chromium. It writes the table of changed elements to the
+      # job summary and uploads the report as the elastishot-report artifact.
+      # A visual change is a notice; the job only fails if the check cannot run.
       - name: Compare the pull request with the target branch
-        # Differences exit 1 on purpose; the report is the deliverable, so the
-        # job stays green and the summary table says what moved.
-        continue-on-error: true
-        run: npm run visual -- --against origin/${{ github.base_ref }}
-
-      - name: Upload Elastishot report
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: elastishot-report
-          path: .elastishot/runs/
-          retention-days: 14
+        uses: Osman19702/elastishot-action@v0.3
 
