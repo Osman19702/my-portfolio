@@ -708,7 +708,7 @@
                 <article class="project-card">
                     <figure class="project-media">
                         <img src="./img/whetprompt.png" width="1200" height="750" loading="lazy" decoding="async"
-                             alt="Whetprompt window, version 0.6.0 beside the name and a 'What's new' link at the right end of the top bar, beside Library. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues, rewritten by the built-in Qwen3 4B model on the GPU. Right: Copy, Apply, Save and a Report link above the rewrite, which scored 93, up 51, with a summary of what changed and per-category bars for clarity, specificity, context, format and structure. Under them a marking bar offers 'Keep it &mdash; I loved it' and 'Change it &mdash; I didn't like it', counts 1 kept and 1 to change, and has a 'Fix again with my marks' button. In the rewritten prompt, the sentence that names the audience and asks for bullet points is highlighted green as kept, and the sentence that caps the length at 200 words is highlighted red, to be changed.">
+                             alt="Whetprompt window, version 0.7.0 beside the name, and Library, Settings and a 'What's new' link at the right end of the top bar. Left: the prompt 'explain how machine learning works' scored 42 out of 100 with 3 issues, rewritten by the built-in Qwen3 4B model on the GPU. Right: Copy, Apply, Save and a Report link above the rewrite, which scored 93, up 51, with a summary of what changed and per-category bars for clarity, specificity, context, format and structure. Under them a marking bar offers 'Keep it &mdash; I loved it' and 'Change it &mdash; I didn't like it', counts 1 kept and 1 to change, and has a 'Fix again with my marks' button. In the rewritten prompt, the sentence that names the audience and asks for bullet points is highlighted green as kept, and the sentence that caps the length at 200 words is highlighted red, to be changed.">
                     </figure>
                     <div class="project-body">
                         <div class="project-info">
@@ -736,11 +736,12 @@
                                 <li>Since October 2026 also for macOS: disk images for Apple Silicon, where the model runs on the GPU through Metal, and for Intel Macs, built from the same 0.4.0 sources and attached to the same release.</li>
                                 <li>Found on a fresh Windows install, fixed in 0.5.0: the local model would not start, and all it said was an error class name. Its llama.cpp binaries need Microsoft&rsquo;s C++ runtime, which a new Windows does not have; the installer now carries its own copy, a build that cannot find one fails instead of shipping, and a model that still cannot start says why.</li>
                                 <li>New in 0.6.0: in the <a href="https://apps.microsoft.com/detail/9P750H35HR59" target="_blank" rel="noopener noreferrer">Microsoft Store</a>. The release workflow builds the Store package beside the installer, from the same build, and a test-signed copy was installed and used on a Windows machine without the C++ runtime before it went in. A <em>Report</em> link beside every rewrite answers the Store&rsquo;s rule for generative AI, and a Store install keeps its library and model where Windows removes them with the app.</li>
+                                <li>New in 0.7.0: <em>Settings</em>, where a cloud provider&rsquo;s API key goes. Paste it, press <em>Test</em> to ask the provider whether it accepts it, and the provider works at once, with no file to edit and no restart. The key goes into the same settings file the app always read, only its own line changed, and is never shown again; the server refuses anything that is not a key, and any request to change one that does not come from this machine. Also fixed: the current Claude models refuse the temperature setting every request used to carry, so a model that refuses it is now asked without it.</li>
                             </ul>
                             <div class="project-stack">
                                 <span>Electron</span><span>React</span><span>TypeScript</span><span>Vite</span><span>Node.js / Express</span><span>node-llama-cpp</span><span>Playwright</span><span>Elastishot</span>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 115 Gherkin scenarios, 105 of them automated with Playwright, plus 357 unit and component tests. The interface is checked against approved screenshots with Elastishot.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-check-circle"></use></svg> ATDD: 118 Gherkin scenarios, 108 of them automated with Playwright, plus 376 unit and component tests. The interface is checked against approved screenshots with Elastishot.</p>
                             <p class="project-links">
                                 <a href="https://www.whetprompt.com/" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-globe"></use></svg> Website</a>
                                 <a href="https://github.com/Osman19702/Whetprompt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 496 512" aria-hidden="true" focusable="false"><use href="#i-github"></use></svg> Source on GitHub</a>
@@ -759,24 +760,24 @@
 
                             <h4 class="project-subhead">Download for Windows</h4>
                             <div class="btn-con">
-                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.6.0/Whetprompt-0.6.0-win-x64.exe"
+                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.7.0/Whetprompt-0.7.0-win-x64.exe"
                                    class="main-btn project-btn" data-download="win-x64" target="_blank" rel="noopener noreferrer" aria-describedby="whetprompt-note">
                                     <span class="btn-text">Download<span class="sr-only"> Whetprompt for Windows</span></span>
                                     <span class="btn-icon"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg></span>
                                 </a>
                             </div>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="win-x64">0.6.0</span></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><use href="#i-id-badge"></use></svg> Version <span class="project-version" data-download="win-x64">0.7.0</span></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-windows"></use></svg> Windows 10 / 11, 64-bit</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 339.2 MiB installer (355,649,944 bytes). The 2.5 GB language model downloads on first run; after that it works offline.</p>
-                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-10-23">23 Oct 2026</time></p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-cubes"></use></svg> 339.2 MiB installer (355,654,858 bytes). The 2.5 GB language model downloads on first run; after that it works offline.</p>
+                            <p class="project-meta"><svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><use href="#i-calendar-alt"></use></svg> Released <time datetime="2026-10-28">28 Oct 2026</time></p>
                             <p class="project-meta"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-sync-alt"></use></svg> Installed over PromptFixer, it replaces it and keeps its library and downloaded model.</p>
 
                             <p class="project-hash" data-download="win-x64">
                                 <span class="project-hash-label">SHA-256, Windows</span>
-                                <code>4F08E8CD18C4BA4589D4B9807BCFF6AEE3AD0FF413E3C508128DB93B42ACA907</code>
+                                <code>C11BFF46A8298A16CB26EA1B9C307E0327E3BE82F1FE2994B137575BF8319E41</code>
                             </p>
                             <p class="project-verify-label">Verify the file you downloaded (PowerShell):</p>
-                            <pre class="project-verify"><code>Get-FileHash .\Whetprompt-0.6.0-win-x64.exe -Algorithm SHA256</code></pre>
+                            <pre class="project-verify"><code>Get-FileHash .\Whetprompt-0.7.0-win-x64.exe -Algorithm SHA256</code></pre>
 
                             <p class="info-stats project-note" id="whetprompt-note">
                                 <strong>Unsigned installer.</strong> I have not bought a code-signing certificate, so on first run Windows SmartScreen shows
@@ -784,7 +785,7 @@
                                 above matches the file you downloaded. The checksum proves the file is the one I built; it does not mean Windows vouches for it.
                             </p>
                             <p class="project-links">
-                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.6.0/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums for 0.6.0 (SHA256SUMS.txt)</a>
+                                <a href="https://github.com/Osman19702/Whetprompt/releases/download/v0.7.0/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer"><svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><use href="#i-tasks"></use></svg> Checksums for 0.7.0 (SHA256SUMS.txt)</a>
                             </p>
 
                             <h4 class="project-subhead">Download for macOS</h4>
