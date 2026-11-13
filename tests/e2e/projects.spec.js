@@ -4,13 +4,15 @@ const { openPanel } = require('./helpers');
 /**
  * The Projects panel is the one place on the site that hands a visitor
  * something to run: installers and disk images for Whetprompt, an npm
- * package for Elastishot. What makes that safe to accept - a versioned URL on
- * a host they can inspect, a checksum to compare, a plain statement of what
- * the file is and is not - is all content, and content drifts. These tests
- * pin it for every download button of every card, and pin every copy of the
- * version, file name and digest to each other so a rebuild cannot leave one
- * of them stale. Its accessibility is scanned, in both themes, with every
- * other panel's in accessibility.spec.js.
+ * package for Elastishot, store listings for Whetprompt and Tamtava. What
+ * makes that safe to accept - a versioned URL on a host they can inspect, a
+ * checksum to compare, a plain statement of what the file is and is not - is
+ * all content, and content drifts. These tests pin it for every download
+ * button of every card, and pin every copy of the version, file name and
+ * digest to each other so a rebuild cannot leave one of them stale. Tamtava is
+ * only on the App Store, so its card offers no file of its own, and has to say
+ * so rather than leave the visitor looking for one. The panel's accessibility
+ * is scanned, in both themes, with every other panel's in accessibility.spec.js.
  */
 
 const SHA256 = /^[0-9A-F]{64}$/i;
@@ -27,12 +29,18 @@ const GATEKEEPER = [/not notarized/i, /Privacy & Security/, /Open Anyway/];
 // captures the version from the link, and `note` is what the sentence the
 // button is described by must say. `sums` maps a download to the checksum file
 // of its release: downloads can come from different releases, and the card
-// links the checksum file of each one.
+// links the checksum file of each one. `store` is the listing the card's store
+// badge links to, and what the badge's alt text must name. A project with no
+// downloads is only on its store: `storeOnly` is what its note must say
+// instead. `repo` is the public repository the card links to; a private one
+// goes in `privateRepo`, which the card must never link to, since every
+// visitor would get a 404.
 const PROJECTS = [
     {
         name: 'Whetprompt',
         repo: 'https://github.com/Osman19702/Whetprompt',
         stack: ['Electron', 'React', 'TypeScript', 'Playwright'],
+        store: { href: 'https://apps.microsoft.com/detail/9P750H35HR59', alt: /Microsoft Store/ },
         downloads: [
             { key: 'win-x64', asset: WHETPROMPT_ASSET('win-x64\\.exe'), note: [/not code-signed|unsigned/i, /SmartScreen/, /Run anyway/] },
             { key: 'mac-arm64', asset: WHETPROMPT_ASSET('mac-arm64\\.dmg'), note: GATEKEEPER },
@@ -51,6 +59,14 @@ const PROJECTS = [
         sums: () => null,
         sumsPattern: /^https:\/\/github\.com\/Osman19702\/elastishot\/releases\/download\/v(\d+\.\d+\.\d+)\/SHA256SUMS$/,
         verifyMentions: () => 'elastishot@',
+    },
+    {
+        name: 'Tamtava',
+        privateRepo: 'https://github.com/Osman19702/tamtava',
+        stack: ['Expo', 'React Native', 'TypeScript', 'Playwright'],
+        store: { href: 'https://apps.apple.com/app/tamtava/id6831713388', alt: /App Store/ },
+        downloads: [],
+        storeOnly: [/App Store only/, /no installer/],
     },
 ];
 
@@ -84,34 +100,6 @@ test.describe('Projects panel', () => {
         await expect(page.locator('#projects .project-card h3')).toHaveText(PROJECTS.map((p) => p.name));
     });
 
-    // Microsoft's own badge, but served by this site: the page loads nothing from another origin
-    // (links.spec.js checks the CSP), so the badge is two images, one per theme.
-    test('the Microsoft Store badge links to the listing, opens safely and suits the theme', async ({ page }) => {
-        await openProjects(page);
-        const badge = cardOf(page, 0).locator('a.store-badge');
-        await expect(badge).toHaveCount(1);
-        await expect(badge).toHaveAttribute('href', 'https://apps.microsoft.com/detail/9P750H35HR59');
-        await expect(badge).toHaveAttribute('target', '_blank');
-        await expect(badge).toHaveAttribute('rel', /\bnoopener\b/);
-        await expect(badge).toHaveAttribute('rel', /\bnoreferrer\b/);
-        const dark = badge.locator('img.store-badge-dark');
-        const light = badge.locator('img.store-badge-light');
-        for (const img of [dark, light]) {
-            expect(new URL(await img.getAttribute('src'), page.url()).origin, 'served by this site').toBe(new URL(page.url()).origin);
-            await expect(img).toHaveAttribute('alt', /Microsoft Store/);
-        }
-        await badge.scrollIntoViewIfNeeded();
-        await expect(dark).toBeVisible();
-        await expect(light).toBeHidden();
-        await expect.poll(() => dark.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
-
-        await page.locator('.theme-btn').click();
-        await expect(page.locator('html')).toHaveClass(/light-mode/);
-        await expect(light).toBeVisible();
-        await expect(dark).toBeHidden();
-        await expect.poll(() => light.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
-    });
-
     for (const [i, project] of PROJECTS.entries()) {
         test.describe(project.name, () => {
             test('names the project and the stack it is built on', async ({ page }) => {
@@ -123,6 +111,78 @@ test.describe('Projects panel', () => {
                     expect(chips, `stack should list ${tool}`).toContain(tool);
                 }
             });
+
+            test('the screenshot is a real PNG with alt text and dimensions', async ({ page, request }) => {
+                await openProjects(page);
+                const img = cardOf(page, i).locator('.project-media img');
+                await expect(img).toHaveCount(1);
+                expect(((await img.getAttribute('alt')) || '').trim().length).toBeGreaterThan(20);
+                expect(await img.getAttribute('width')).toBeTruthy();
+                expect(await img.getAttribute('height')).toBeTruthy();
+                const response = await request.get(new URL(await img.getAttribute('src'), page.url()).toString());
+                expect(response.status()).toBe(200);
+                expect(response.headers()['content-type']).toContain('image/png');
+                await img.scrollIntoViewIfNeeded();
+                await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+            });
+
+            // The store's own badge, but served by this site: the page loads nothing from another origin
+            // (links.spec.js checks the CSP), so each badge is two images, one per theme.
+            if (project.store) {
+                test('the store badge links to the listing, opens safely and suits the theme', async ({ page }) => {
+                    await openProjects(page);
+                    const badge = cardOf(page, i).locator('a.store-badge');
+                    await expect(badge).toHaveCount(1);
+                    await expect(badge).toHaveAttribute('href', project.store.href);
+                    await expect(badge).toHaveAttribute('target', '_blank');
+                    await expect(badge).toHaveAttribute('rel', /\bnoopener\b/);
+                    await expect(badge).toHaveAttribute('rel', /\bnoreferrer\b/);
+                    const dark = badge.locator('img.store-badge-dark');
+                    const light = badge.locator('img.store-badge-light');
+                    for (const img of [dark, light]) {
+                        expect(new URL(await img.getAttribute('src'), page.url()).origin, 'served by this site').toBe(new URL(page.url()).origin);
+                        await expect(img).toHaveAttribute('alt', project.store.alt);
+                    }
+                    await badge.scrollIntoViewIfNeeded();
+                    await expect(dark).toBeVisible();
+                    await expect(light).toBeHidden();
+                    await expect.poll(() => dark.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+
+                    await page.locator('.theme-btn').click();
+                    await expect(page.locator('html')).toHaveClass(/light-mode/);
+                    await expect(light).toBeVisible();
+                    await expect(dark).toBeHidden();
+                    await expect.poll(() => light.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+                });
+            }
+
+            if (project.privateRepo) {
+                test('links nowhere into its private repository', async ({ page }) => {
+                    await openProjects(page);
+                    const hrefs = await cardOf(page, i).locator('a[href]').evaluateAll((els) => els.map((el) => el.href.toLowerCase()));
+                    const repo = project.privateRepo.toLowerCase();
+                    const into = hrefs.filter((href) => href.startsWith(repo) && /^(?:$|[/?#])/.test(href.slice(repo.length)));
+                    expect(into, 'a link every visitor gets a 404 from').toEqual([]);
+                });
+            }
+
+            // Only on its store: none of the checks below has anything to check, so
+            // instead the card must offer none of it and its note must say why.
+            if (project.downloads.length === 0) {
+                test('offers nothing but its store listing, and its note says why', async ({ page }) => {
+                    await openProjects(page);
+                    const card = cardOf(page, i);
+                    for (const selector of ['a.project-btn', '.project-version', '.project-hash', '.project-verify', 'a[href*="SHA256SUMS"]']) {
+                        await expect(card.locator(selector), selector).toHaveCount(0);
+                    }
+                    await expect(card.locator('a.store-badge'), 'the only way to get it').toHaveCount(1);
+                    const note = card.locator('.project-note');
+                    await expect(note).toHaveCount(1);
+                    await expect(note).toBeVisible();
+                    for (const pattern of project.storeOnly) await expect(note).toContainText(pattern);
+                });
+                return;
+            }
 
             test('every download link is versioned or canonical, and opens safely', async ({ page }) => {
                 await openProjects(page);
@@ -227,20 +287,6 @@ test.describe('Projects panel', () => {
                     await expect(note).toHaveClass(/\bproject-note\b/);
                     for (const pattern of download.note) await expect(note, download.key).toContainText(pattern);
                 }
-            });
-
-            test('the screenshot is a real PNG with alt text and dimensions', async ({ page, request }) => {
-                await openProjects(page);
-                const img = cardOf(page, i).locator('.project-media img');
-                await expect(img).toHaveCount(1);
-                expect(((await img.getAttribute('alt')) || '').trim().length).toBeGreaterThan(20);
-                expect(await img.getAttribute('width')).toBeTruthy();
-                expect(await img.getAttribute('height')).toBeTruthy();
-                const response = await request.get(new URL(await img.getAttribute('src'), page.url()).toString());
-                expect(response.status()).toBe(200);
-                expect(response.headers()['content-type']).toContain('image/png');
-                await img.scrollIntoViewIfNeeded();
-                await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
             });
 
             // responsive.spec.js checks that every panel fits a 360px viewport.
