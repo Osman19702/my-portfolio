@@ -76,7 +76,7 @@ live send was verified once, by hand, with a real browser UA.
 | `responsive.spec.js` | 360 / 768 / 1440 — horizontal scroll and content clipping |
 | `seo.spec.js` | Metadata, Open Graph, JSON-LD, robots, sitemap, favicons |
 | `console.spec.js` | No console errors, no failed requests |
-| `projects.spec.js` | The Projects panel, one card per project (Whetprompt, Elastishot): a versioned release or package URL and new-tab safety for every download button (Whetprompt has three: Windows, macOS on Apple Silicon, macOS on Intel), each download's version / file / hash copies pinned to each other (Windows and macOS can be on different releases), the checksum file of every release on the card, the note that says what the visitor gets, the Microsoft Store badge (link, new-tab safety, one image per theme, served by this site), 360px fit |
+| `projects.spec.js` | The Projects panel, one card per project (Whetprompt, Elastishot, Tamtava): a versioned release or package URL and new-tab safety for every download button (Whetprompt has three: Windows, macOS on Apple Silicon, macOS on Intel), each download's version / file / hash copies pinned to each other (Windows and macOS can be on different releases), the checksum file of every release on the card, the note that says what the visitor gets, each store badge, the Microsoft Store on Whetprompt and the App Store on Tamtava (link, new-tab safety, one image per theme, served by this site), 360px fit; a project only on its store (Tamtava) offers no download, version, hash or checksum file, says so in its note, and never links into its private repository |
 | `icons.spec.js` | Every icon resolves to a sprite symbol and carries that symbol's `viewBox`; no unused symbols |
 
 Shared constants and helpers (the section list, opening a panel, the axe scan) live in
@@ -152,8 +152,13 @@ img/whetprompt.png          the Whetprompt screenshot on the Projects tab (a rea
                             scripts/capture-screenshot.mjs; the command is in its header)
 img/ms-store-badge-*.svg    Microsoft's "Download from the Microsoft Store" badge, dark and light, on the Whetprompt card; kept
                             here rather than loaded from Microsoft, so the CSP still allows no other origin
+img/app-store-badge-*.svg   Apple's "Download on the App Store" badge, black (dark theme) and white (light theme), on the Tamtava card;
+                            Apple's artwork unchanged, kept here rather than loaded from Apple for the same reason
 img/elastishot.png          the Elastishot screenshot on the Projects tab (a real report from its UI lab,
                             made with Elastishot's scripts/capture-portfolio-shot.mjs; the command is in its header)
+img/tamtava.png             the Tamtava screenshot on the Projects tab: three screens of its web build (plate-light,
+                            cook-light, at-home-fridge-light), captured at 440 x 956 through Tamtava's own visual-check
+                            targets and fixtures, as its `npm run screenshots:store` does, side by side on its terracotta
 scripts/build-icon-sprite.js  regenerates the sprite from Font Awesome
 tests/e2e/                  Playwright specs, plus helpers.js shared between them
 tests/static-server.js      zero-dependency static server for local and CI runs

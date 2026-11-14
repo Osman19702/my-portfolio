@@ -929,10 +929,11 @@ section {
 .project-download .btn-con {
   margin-bottom: 1rem;
 }
-/* The "Download from the Microsoft Store" badge on the Whetprompt card: Microsoft's own artwork, the dark
-   and the light version, kept in img/ because the page loads nothing from another origin (see
-   the CSP). The one for the current theme shows, as Microsoft's badge script would pick it; the
-   other is display: none, so it is neither drawn, fetched (it is lazy) nor read out. */
+/* The store badges: "Download from the Microsoft Store" on the Whetprompt card and "Download on the
+   App Store" on the Tamtava card. Each is the store's own artwork, a dark and a light version, kept
+   in img/ because the page loads nothing from another origin (see the CSP). The one for the current
+   theme shows, as Microsoft's badge script would pick it; the other is display: none, so it is
+   neither drawn, fetched (it is lazy) nor read out. */
 .project-store {
   margin-bottom: 0.2rem;
 }
@@ -945,6 +946,11 @@ section {
   width: 200px;
   max-width: 100%;
   height: auto;
+}
+/* Apple's badge is narrower for its height (about 3:1 against Microsoft's 3.66:1): at 165px wide
+   both badges stand 55px tall. */
+.app-store-badge img {
+  width: 165px;
 }
 .store-badge-light,
 .light-mode .store-badge-dark {
